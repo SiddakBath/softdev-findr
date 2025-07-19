@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "91374172570",
+    "project_id": "findr-b1753",
+    "storage_bucket": "findr-b1753.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:91374172570:android:d36b3b4713d35d3a55e223",
+        "android_client_info": {
+          "package_name": "com.example.findr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3SKb9lgpypG7NtN6YqFfi7INm5a4g3Co"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
