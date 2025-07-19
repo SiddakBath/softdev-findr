@@ -25,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
         title: const Text(
           'Findr',
           style: TextStyle(
@@ -66,45 +67,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 20),
 
                 // Search Bar
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.purple[200]!),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: const InputDecoration(
-                            hintText: 'Search',
-                            hintStyle: TextStyle(color: Colors.grey),
-                            prefixIcon: Icon(Icons.search, color: Colors.grey),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                        ),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.purple[200]!),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      hintText: 'Search',
+                      hintStyle: TextStyle(color: Colors.grey),
+                      prefixIcon: Icon(Icons.search, color: Colors.grey),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.swap_vert, color: Colors.grey),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
           ),
 
-          // Reports List
+          // Reports Grid
           Expanded(
             child: StreamBuilder<List<Report>>(
               stream: firestore.getReports(filter),
@@ -132,8 +118,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       return true;
                     }).toList();
 
-                return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                return GridView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.8,
+                  ),
                   itemCount: filteredReports.length,
                   itemBuilder: (context, index) {
                     return ReportCard(

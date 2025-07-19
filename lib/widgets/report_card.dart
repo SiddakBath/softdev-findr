@@ -27,168 +27,195 @@ class ReportCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: Colors.transparent, // Make container transparent
-          // The decoration is now on the inner container
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.purple[200]!),
         ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.purple[200]!),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Image placeholder
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: _getImageColor(),
-                    borderRadius: BorderRadius.circular(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image at the top
+            Expanded(
+              flex: 3,
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: _getImageColor(),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
                   ),
-                  child:
-                      report.imageUrl != null
-                          ? ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              report.imageUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return _buildImagePlaceholder();
-                              },
-                            ),
-                          )
-                          : _buildImagePlaceholder(),
                 ),
+                child: Stack(
+                  children: [
+                    report.imageUrl != null
+                        ? ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12),
+                          ),
+                          child: Image.network(
+                            report.imageUrl!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            errorBuilder: (context, error, stackTrace) {
+                              return _buildImagePlaceholder();
+                            },
+                          ),
+                        )
+                        : _buildImagePlaceholder(),
 
-                SizedBox(width: 16),
-
-                // Content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Title
-                      Text(
-                        report.title,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                    // Menu button (three dots) - only show if user is owner
+                    if (isOwner &&
+                        (onEdit != null ||
+                            onDelete != null ||
+                            onResolve != null))
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.8),
+                            shape: BoxShape.circle,
+                          ),
+                          child: PopupMenuButton<String>(
+                            icon: Icon(
+                              Icons.more_vert,
+                              color: Colors.grey[700],
+                              size: 20,
+                            ),
+                            onSelected: (value) {
+                              switch (value) {
+                                case 'edit':
+                                  onEdit?.call();
+                                  break;
+                                case 'delete':
+                                  onDelete?.call();
+                                  break;
+                                case 'resolve':
+                                  onResolve?.call();
+                                  break;
+                              }
+                            },
+                            itemBuilder:
+                                (context) => [
+                                  if (onResolve != null && !report.resolved)
+                                    PopupMenuItem(
+                                      value: 'resolve',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.check, size: 20),
+                                          SizedBox(width: 8),
+                                          Text('Mark as resolved'),
+                                        ],
+                                      ),
+                                    ),
+                                  if (onEdit != null)
+                                    PopupMenuItem(
+                                      value: 'edit',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.edit, size: 20),
+                                          SizedBox(width: 8),
+                                          Text('Edit'),
+                                        ],
+                                      ),
+                                    ),
+                                  if (onDelete != null)
+                                    PopupMenuItem(
+                                      value: 'delete',
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.delete,
+                                            size: 20,
+                                            color: Colors.red,
+                                          ),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            'Delete',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                ],
+                          ),
                         ),
                       ),
-
-                      SizedBox(height: 8),
-
-                      // Description
-                      Text(
-                        report.description,
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-
-                      SizedBox(height: 12),
-
-                      // Tags
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 4,
-                        children:
-                            report.tags.take(3).map((tag) {
-                              return Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[200],
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  tag,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                      ),
-                    ],
-                  ),
+                  ],
                 ),
-
-                // Menu button (three dots) - only show if user is owner
-                if (isOwner &&
-                    (onEdit != null || onDelete != null || onResolve != null))
-                  PopupMenuButton<String>(
-                    icon: Icon(Icons.more_vert, color: Colors.grey),
-                    onSelected: (value) {
-                      switch (value) {
-                        case 'edit':
-                          onEdit?.call();
-                          break;
-                        case 'delete':
-                          onDelete?.call();
-                          break;
-                        case 'resolve':
-                          onResolve?.call();
-                          break;
-                      }
-                    },
-                    itemBuilder:
-                        (context) => [
-                          if (onResolve != null && !report.resolved)
-                            PopupMenuItem(
-                              value: 'resolve',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.check, size: 20),
-                                  SizedBox(width: 8),
-                                  Text('Mark as resolved'),
-                                ],
-                              ),
-                            ),
-                          if (onEdit != null)
-                            PopupMenuItem(
-                              value: 'edit',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.edit, size: 20),
-                                  SizedBox(width: 8),
-                                  Text('Edit'),
-                                ],
-                              ),
-                            ),
-                          if (onDelete != null)
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.delete,
-                                    size: 20,
-                                    color: Colors.red,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Delete',
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                  ),
-              ],
+              ),
             ),
-          ),
+
+            // Content section
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Text(
+                      report.title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    // Description
+                    Text(
+                      report.description,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                        height: 1.3,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const Spacer(),
+
+                    // Tags at the bottom
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children:
+                          report.tags.take(3).map((tag) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                tag,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -196,11 +223,16 @@ class ReportCard extends StatelessWidget {
 
   Widget _buildImagePlaceholder() {
     return Container(
+      width: double.infinity,
+      height: double.infinity,
       decoration: BoxDecoration(
         color: _getImageColor(),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(12),
+          topRight: Radius.circular(12),
+        ),
       ),
-      child: Icon(Icons.image, color: Colors.white, size: 32),
+      child: Icon(Icons.image, color: Colors.white, size: 40),
     );
   }
 
