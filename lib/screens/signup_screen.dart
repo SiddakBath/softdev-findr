@@ -2,30 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import 'home_screen.dart';
-import 'signup_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class SignupScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _SignupScreenState createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   final AuthService _authService = AuthService();
   String? errorMessage;
   bool isLoading = false;
 
-  void login() async {
+  void signUp() async {
     if (formKey.currentState!.validate()) {
+      if (passwordController.text != confirmPasswordController.text) {
+        setState(() {
+          errorMessage = 'Passwords do not match';
+        });
+        return;
+      }
+
       setState(() {
         isLoading = true;
         errorMessage = null;
       });
 
       try {
-        await _authService.signInWithEmailAndPassword(
+        await _authService.signUpWithEmailAndPassword(
           emailController.text.trim(),
           passwordController.text.trim(),
         );
@@ -66,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 // Title
                 const Text(
-                  'Login',
+                  'Sign Up',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -165,13 +172,51 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 20),
+
+                // Confirm Password field
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Confirm Password',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.purple[200]!),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextFormField(
+                        controller: confirmPasswordController,
+                        decoration: const InputDecoration(
+                          hintText: '••••••••',
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                        obscureText: true,
+                        validator:
+                            (v) => v!.isEmpty ? 'Confirm password' : null,
+                        enabled: !isLoading,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 32),
 
                 // Submit button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: isLoading ? null : login,
+                    onPressed: isLoading ? null : signUp,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.purple[600],
                       foregroundColor: Colors.white,
@@ -202,17 +247,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Sign up link
+                // Login link
                 TextButton(
-                  onPressed:
-                      isLoading
-                          ? null
-                          : () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => SignupScreen()),
-                          ),
+                  onPressed: isLoading ? null : () => Navigator.pop(context),
                   child: Text(
-                    'Don\'t have an account? Sign up',
+                    'Already have an account? Login',
                     style: TextStyle(
                       color: Colors.purple[600],
                       fontWeight: FontWeight.w600,

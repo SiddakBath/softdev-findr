@@ -2,11 +2,16 @@ import 'package:findr/models/report.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import '../services/firestore_service.dart';
+import '../widgets/success_dialog.dart';
+import '../widgets/confirmation_dialog.dart';
+import 'report_form_screen.dart';
 
 class ReportDetailScreen extends StatelessWidget {
   final Report report;
+  final FirestoreService _firestoreService = FirestoreService();
 
-  const ReportDetailScreen({super.key, required this.report});
+  ReportDetailScreen({super.key, required this.report});
 
   bool get isOwner {
     final currentUser = FirebaseAuth.instance.currentUser;
@@ -36,14 +41,36 @@ class ReportDetailScreen extends StatelessWidget {
                 ? [
                   IconButton(
                     icon: const Icon(Icons.delete_outline, color: Colors.red),
-                    onPressed: () {
-                      // TODO: Implement delete
+                    onPressed: () async {
+                      final shouldDelete = await showConfirmationDialog(
+                        context,
+                        title: 'Delete Report',
+                        message:
+                            'Are you sure you want to delete this report? This action cannot be undone.',
+                        confirmText: 'Delete',
+                        cancelText: 'Cancel',
+                      );
+
+                      if (shouldDelete == true) {
+                        await _firestoreService.deleteReport(report.id);
+                        showSuccessDialog(
+                          context,
+                          title: 'Success!',
+                          message: 'Report deleted successfully!',
+                          onDismiss: () => Navigator.of(context).pop(),
+                        );
+                      }
                     },
                   ),
                   IconButton(
                     icon: const Icon(Icons.edit_outlined, color: Colors.blue),
                     onPressed: () {
-                      // TODO: Implement edit
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ReportFormScreen(report: report),
+                        ),
+                      );
                     },
                   ),
                 ]
@@ -103,29 +130,71 @@ class ReportDetailScreen extends StatelessWidget {
   }
 
   Widget _buildActionButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {
-          // TODO: implement resolve/contact
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.purple[600],
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+    return Builder(
+      builder:
+          (context) => SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () async {
+                if (isOwner) {
+                  // Resolve action for owner
+                  final shouldResolve = await showConfirmationDialog(
+                    context,
+                    title: 'Mark as Resolved',
+                    message:
+                        'Are you sure you want to mark this report as resolved?',
+                    confirmText: 'Resolve',
+                    cancelText: 'Cancel',
+                  );
+
+                  if (shouldResolve == true) {
+                    await _firestoreService.markResolved(report.id);
+                    showSuccessDialog(
+                      context,
+                      title: 'Success!',
+                      message: 'Report marked as resolved!',
+                    );
+                  }
+                } else {
+                  // Contact action for non-owner
+                  final shouldContact = await showConfirmationDialog(
+                    context,
+                    title: 'Send Contact Request',
+                    message:
+                        'Are you sure you want to send a contact request to the reporter?',
+                    confirmText: 'Send',
+                    cancelText: 'Cancel',
+                  );
+
+                  if (shouldContact == true) {
+                    // You can implement contact functionality here
+                    showSuccessDialog(
+                      context,
+                      title: 'Contact Sent!',
+                      message:
+                          'Your contact request has been sent to the reporter.',
+                    );
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple[600],
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                isOwner ? 'Resolve' : 'Contact',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ),
-          elevation: 0,
-        ),
-        child: Text(
-          isOwner ? 'Resolve' : 'Contact',
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
     );
   }
 

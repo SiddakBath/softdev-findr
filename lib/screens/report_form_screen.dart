@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/report.dart';
 import '../services/firestore_service.dart';
+import '../widgets/success_dialog.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -145,7 +146,27 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         widget.report == null
             ? service.addReport(report)
             : service.updateReport(report);
-    action.then((_) => Navigator.pop(context));
+    action
+        .then((_) {
+          showSuccessDialog(
+            context,
+            title: 'Success!',
+            message:
+                widget.report == null
+                    ? 'Report added successfully!'
+                    : 'Report updated successfully!',
+            onDismiss: () => Navigator.pop(context),
+          );
+        })
+        .catchError((error) {
+          // Handle error if needed
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: ${error.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        });
   }
 
   Future<void> _selectDate() async {

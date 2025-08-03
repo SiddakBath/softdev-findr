@@ -3,6 +3,8 @@ import 'report_form_screen.dart';
 import '../services/firestore_service.dart';
 import '../services/auth_service.dart';
 import '../widgets/report_card.dart';
+import '../widgets/success_dialog.dart';
+import '../widgets/confirmation_dialog.dart';
 import '../models/report.dart';
 import 'package:findr/screens/report_detail_screen.dart';
 
@@ -150,12 +152,48 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                             ),
                           ),
-                      onDelete:
-                          () =>
-                              firestore.deleteReport(filteredReports[index].id),
-                      onResolve:
-                          () =>
-                              firestore.markResolved(filteredReports[index].id),
+                      onDelete: () async {
+                        final shouldDelete = await showConfirmationDialog(
+                          context,
+                          title: 'Delete Report',
+                          message:
+                              'Are you sure you want to delete this report? This action cannot be undone.',
+                          confirmText: 'Delete',
+                          cancelText: 'Cancel',
+                        );
+
+                        if (shouldDelete == true) {
+                          await firestore.deleteReport(
+                            filteredReports[index].id,
+                          );
+                          showSuccessDialog(
+                            context,
+                            title: 'Success!',
+                            message: 'Report deleted successfully!',
+                          );
+                        }
+                      },
+                      onResolve: () async {
+                        final shouldResolve = await showConfirmationDialog(
+                          context,
+                          title: 'Mark as Resolved',
+                          message:
+                              'Are you sure you want to mark this report as resolved?',
+                          confirmText: 'Resolve',
+                          cancelText: 'Cancel',
+                        );
+
+                        if (shouldResolve == true) {
+                          await firestore.markResolved(
+                            filteredReports[index].id,
+                          );
+                          showSuccessDialog(
+                            context,
+                            title: 'Success!',
+                            message: 'Report marked as resolved!',
+                          );
+                        }
+                      },
                     );
                   },
                 );
@@ -183,6 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: const Icon(Icons.add, color: Colors.black, size: 30),
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
