@@ -1,24 +1,102 @@
+/**
+ * signup_screen.dart
+ * 
+ * User registration screen for new account creation
+ * 
+ * Provides registration interface with password confirmation and form validation.
+ * Includes navigation back to login screen for existing users.
+ * 
+ * Author: [Your Name]
+ * Created: [Date]
+ * Last Modified: [Date]
+ */
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import 'home_screen.dart';
 
+/**
+ * Signup screen widget for new user registration
+ * 
+ * Provides a clean, user-friendly interface for new users to create accounts
+ * in the Findr application. Handles form state, validation, and registration
+ * flow with proper error handling and loading states.
+ * 
+ * Registration Flow:
+ * - Form validation (email, password, password confirmation)
+ * - Password matching validation
+ * - Firebase account creation
+ * - Automatic navigation to HomeScreen on success via AuthWrapper
+ * - Error display and retry capability on failure
+ */
 class SignupScreen extends StatefulWidget {
   @override
   _SignupScreenState createState() => _SignupScreenState();
 }
 
+/**
+ * State class for the signup screen
+ * 
+ * Manages the registration form state including:
+ * - Email, password, and confirm password input controllers
+ * - Form validation state
+ * - Loading state during registration
+ * - Error message display
+ * - Authentication service integration
+ * 
+ * State Variables:
+ * - emailController: TextEditingController for email input
+ * - passwordController: TextEditingController for password input
+ * - confirmPasswordController: TextEditingController for password confirmation
+ * - formKey: GlobalKey<FormState> for form validation
+ * - _authService: AuthService instance for authentication
+ * - errorMessage: String? for displaying registration errors
+ * - isLoading: bool for showing loading state during registration
+ */
 class _SignupScreenState extends State<SignupScreen> {
+  // Form input controllers
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
-  final formKey = GlobalKey<FormState>();
-  final AuthService _authService = AuthService();
-  String? errorMessage;
-  bool isLoading = false;
 
+  // Form validation key
+  final formKey = GlobalKey<FormState>();
+
+  // Authentication service instance
+  final AuthService _authService = AuthService();
+
+  // UI state variables
+  String? errorMessage; // Error message to display
+  bool isLoading = false; // Loading state during registration
+
+  /**
+   * Handle user registration
+   * 
+   * Validates the form inputs, checks password confirmation, and attempts
+   * to create a new user account with Firebase Auth. Handles loading states
+   * and error display.
+   * 
+   * Registration Flow:
+   * 1. Validate form inputs
+   * 2. Check password confirmation match
+   * 3. Set loading state to true
+   * 4. Clear any previous error messages
+   * 5. Attempt account creation with Firebase
+   * 6. Handle success (navigation handled by AuthWrapper)
+   * 7. Handle errors with user-friendly messages
+   * 8. Reset loading state
+   * 
+   * Validation Steps:
+   * - Email format validation
+   * - Password strength requirements
+   * - Password confirmation matching
+   * - Firebase-specific validation (email uniqueness, etc.)
+   */
   void signUp() async {
+    // Validate form before attempting registration
     if (formKey.currentState!.validate()) {
+      // Check if passwords match
       if (passwordController.text != confirmPasswordController.text) {
         setState(() {
           errorMessage = 'Passwords do not match';
@@ -27,26 +105,30 @@ class _SignupScreenState extends State<SignupScreen> {
       }
 
       setState(() {
-        isLoading = true;
-        errorMessage = null;
+        isLoading = true; // Show loading indicator
+        errorMessage = null; // Clear previous errors
       });
 
       try {
+        // Attempt to create new user account
         await _authService.signUpWithEmailAndPassword(
-          emailController.text.trim(),
-          passwordController.text.trim(),
+          emailController.text.trim(), // Remove whitespace from email
+          passwordController.text.trim(), // Remove whitespace from password
         );
-        // Navigation is now handled by AuthWrapper
+        // Navigation is now handled by AuthWrapper in main.dart
+        // Successful registration will automatically navigate to HomeScreen
       } catch (e) {
+        // Handle registration errors
         if (mounted) {
           setState(() {
-            errorMessage = e.toString();
+            errorMessage = e.toString(); // Display error message
           });
         }
       } finally {
+        // Reset loading state regardless of success/failure
         if (mounted) {
           setState(() {
-            isLoading = false;
+            isLoading = false; // Hide loading indicator
           });
         }
       }
@@ -71,7 +153,7 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Title
+                // Application title
                 const Text(
                   'Sign Up',
                   style: TextStyle(
@@ -83,12 +165,12 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // Error message
+                // Error message display
                 if (errorMessage != null) ...[
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.red[50],
+                      color: Colors.red[50], // Light red background
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.red[200]!),
                     ),
@@ -101,7 +183,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   const SizedBox(height: 16),
                 ],
 
-                // Email field
+                // Email input field
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -129,15 +211,19 @@ class _SignupScreenState extends State<SignupScreen> {
                             vertical: 12,
                           ),
                         ),
-                        validator: (v) => v!.isEmpty ? 'Enter email' : null,
-                        enabled: !isLoading,
+                        validator:
+                            (v) =>
+                                v!.isEmpty
+                                    ? 'Enter email'
+                                    : null, // Form validation
+                        enabled: !isLoading, // Disable during registration
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
 
-                // Password field
+                // Password input field
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -165,16 +251,20 @@ class _SignupScreenState extends State<SignupScreen> {
                             vertical: 12,
                           ),
                         ),
-                        obscureText: true,
-                        validator: (v) => v!.isEmpty ? 'Enter password' : null,
-                        enabled: !isLoading,
+                        obscureText: true, // Hide password characters
+                        validator:
+                            (v) =>
+                                v!.isEmpty
+                                    ? 'Enter password'
+                                    : null, // Form validation
+                        enabled: !isLoading, // Disable during registration
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
 
-                // Confirm Password field
+                // Confirm password input field
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -202,21 +292,25 @@ class _SignupScreenState extends State<SignupScreen> {
                             vertical: 12,
                           ),
                         ),
-                        obscureText: true,
+                        obscureText: true, // Hide password characters
                         validator:
-                            (v) => v!.isEmpty ? 'Confirm password' : null,
-                        enabled: !isLoading,
+                            (v) =>
+                                v!.isEmpty
+                                    ? 'Confirm password'
+                                    : null, // Form validation
+                        enabled: !isLoading, // Disable during registration
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 32),
 
-                // Submit button
+                // Registration submit button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: isLoading ? null : signUp,
+                    onPressed:
+                        isLoading ? null : signUp, // Disable during loading
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.purple[600],
                       foregroundColor: Colors.white,
@@ -247,9 +341,12 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Login link
+                // Navigation back to login screen
                 TextButton(
-                  onPressed: isLoading ? null : () => Navigator.pop(context),
+                  onPressed:
+                      isLoading
+                          ? null
+                          : () => Navigator.pop(context), // Go back to login
                   child: Text(
                     'Already have an account? Login',
                     style: TextStyle(

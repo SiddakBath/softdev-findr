@@ -1,3 +1,16 @@
+/**
+ * report_form_screen.dart
+ * 
+ * Report creation and editing screen
+ * 
+ * Provides comprehensive form interface for creating and editing reports.
+ * Includes image upload, color selection, and form validation.
+ * 
+ * Author: [Your Name]
+ * Created: [Date]
+ * Last Modified: [Date]
+ */
+
 import 'package:flutter/material.dart';
 import '../models/report.dart';
 import '../services/firestore_service.dart';
@@ -6,16 +19,60 @@ import 'package:uuid/uuid.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
+/**
+ * Report form screen for creating and editing reports
+ * 
+ * Provides a comprehensive form interface for managing lost and found reports.
+ * Supports both creation of new reports and editing of existing ones with
+ * full form validation and image upload capabilities.
+ * 
+ * Form Modes:
+ * - Creation Mode: Empty form for new report creation
+ * - Edit Mode: Pre-populated form for existing report modification
+ * 
+ * User Interactions:
+ * - Text input for all report fields
+ * - Image selection from device gallery
+ * - Color picker for visual item identification
+ * - Date/time picker for temporal information
+ * - Form validation with error feedback
+ * - Submit action with success confirmation
+ */
 class ReportFormScreen extends StatefulWidget {
-  final Report? report;
+  final Report? report; // Optional report for editing mode
+
   ReportFormScreen({this.report});
 
   @override
   _ReportFormScreenState createState() => _ReportFormScreenState();
 }
 
+/**
+ * State class for the report form screen
+ * 
+ * Manages the form state including:
+ * - Text controllers for all form fields
+ * - Form validation state
+ * - Image selection and display
+ * - Color selection with visual feedback
+ * - Date/time selection
+ * - Type selection (lost/found)
+ * - Loading states during submission
+ * 
+ * State Variables:
+ * - formKey: GlobalKey<FormState> for form validation
+ * - Various TextEditingController instances for form fields
+ * - type: String for lost/found selection
+ * - selectedDate/selectedTime: DateTime/TimeOfDay for temporal data
+ * - selectedColor: Color for visual item identification
+ * - selectedImage: File? for uploaded image
+ * - _picker: ImagePicker instance for image selection
+ */
 class _ReportFormScreenState extends State<ReportFormScreen> {
+  // Form validation key
   final formKey = GlobalKey<FormState>();
+
+  // Text controllers for form fields
   final titleController = TextEditingController();
   final descController = TextEditingController();
   final colourController = TextEditingController();
@@ -23,7 +80,9 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   final reporterNameController = TextEditingController();
   final reporterEmailController = TextEditingController();
   final tagsController = TextEditingController();
-  String type = 'lost';
+
+  // Form state variables
+  String type = 'lost'; // Default to lost items
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
   Color selectedColor = Colors.grey;
@@ -33,6 +92,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialize form with existing report data if editing
     if (widget.report != null) {
       final r = widget.report!;
       titleController.text = r.title;
@@ -41,7 +101,9 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
       locationController.text = r.location;
       reporterNameController.text = r.reporterName;
       reporterEmailController.text = r.reporterEmail;
-      tagsController.text = r.tags.join(', ');
+      tagsController.text = r.tags.join(
+        ', ',
+      ); // Convert tags list to comma-separated string
       type = r.type;
       selectedDate = r.timeFoundLost;
       selectedTime = TimeOfDay.fromDateTime(r.timeFoundLost);
@@ -49,22 +111,44 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     }
   }
 
+  /**
+   * Pick image from device gallery
+   * 
+   * Opens the device image picker to select an image from the gallery.
+   * Updates the selectedImage state when an image is chosen.
+   * 
+   * Returns: Future<void> - Completes when image selection is finished
+   */
   Future<void> _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       setState(() {
-        selectedImage = File(image.path);
+        selectedImage = File(image.path); // Convert to File object
       });
     }
   }
 
+  /**
+   * Update selected color based on color text input
+   * 
+   * Parses color text (hex code or color name) and updates the
+   * selectedColor state for visual feedback in the color picker.
+   * 
+   * Parameters:
+   * - colorText: String - Color value as text (hex or name)
+   * 
+   * Color Support:
+   * - Hex colors: #RRGGBB format
+   * - Named colors: red, blue, green, yellow, purple, orange, pink, brown, grey
+   */
   void _updateSelectedColor(String colorText) {
     if (colorText.isNotEmpty) {
       try {
         // Try to parse as hex color
         if (colorText.startsWith('#')) {
           selectedColor = Color(
-            int.parse(colorText.substring(1), radix: 16) + 0xFF000000,
+            int.parse(colorText.substring(1), radix: 16) +
+                0xFF000000, // Add alpha channel
           );
         } else {
           // Try to parse as color name
@@ -98,14 +182,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
               selectedColor = Colors.grey;
               break;
             default:
-              selectedColor = Colors.grey;
+              // Keep current color if parsing fails
+              break;
           }
         }
       } catch (e) {
-        selectedColor = Colors.grey;
+        // Keep current color if parsing fails
       }
-    } else {
-      selectedColor = Colors.grey;
     }
   }
 

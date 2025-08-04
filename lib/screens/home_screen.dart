@@ -1,3 +1,16 @@
+/**
+ * home_screen.dart
+ * 
+ * Main dashboard screen for the Findr application
+ * 
+ * Displays grid of lost and found reports with filtering and search capabilities.
+ * Provides report management actions and navigation to other screens.
+ * 
+ * Author: [Your Name]
+ * Created: [Date]
+ * Last Modified: [Date]
+ */
+
 import 'package:flutter/material.dart';
 import 'report_form_screen.dart';
 import '../services/firestore_service.dart';
@@ -8,17 +21,46 @@ import '../widgets/confirmation_dialog.dart';
 import '../models/report.dart';
 import 'package:findr/screens/report_detail_screen.dart';
 
+/**
+ * Home screen widget displaying the main dashboard
+ * 
+ * Provides the primary interface for users to browse and manage lost and found
+ * reports. Includes filtering, search, and report management capabilities.
+ * 
+ * State Management:
+ * - Uses StatefulWidget for local state management
+ * - Manages filter selection, search text, and UI state
+ * - Integrates with FirestoreService for real-time data
+ */
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
+/**
+ * State class for the home screen
+ * 
+ * Manages the UI state including:
+ * - Current filter selection (lost/found)
+ * - Search text input
+ * - Service instances for data operations
+ * 
+ * Data Flow:
+ * 1. StreamBuilder listens to Firestore reports stream
+ * 2. Reports are filtered by type and search query
+ * 3. Filtered reports displayed in grid layout
+ * 4. User interactions trigger appropriate service calls
+ */
 class _HomeScreenState extends State<HomeScreen> {
+  // Service instances for data operations
   final firestore = FirestoreService();
   final authService = AuthService();
-  String? filter;
-  String selectedType = 'lost'; // 'lost' or 'found'
-  final TextEditingController _searchController = TextEditingController();
+
+  // UI state variables
+  String? filter; // Current filter for Firestore query
+  String selectedType = 'lost'; // Current type filter ('lost' or 'found')
+  final TextEditingController _searchController =
+      TextEditingController(); // Search input controller
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +79,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
+          // Logout button in app bar
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.grey),
             onPressed: () async {
-              await authService.signOut();
+              await authService.signOut(); // Sign out current user
             },
           ),
         ],
@@ -52,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                // Toggle Switch
+                // Toggle Switch for Lost/Found Filter
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.grey[100],
@@ -92,22 +135,26 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // Reports Grid
+          // Reports Grid Section
           Expanded(
             child: StreamBuilder<List<Report>>(
+              // Listen to real-time reports stream with current filter
               stream: firestore.getReports(filter),
               builder: (context, snapshot) {
+                // Show loading indicator while data is being fetched
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
                 final reports = snapshot.data!;
+
+                // Apply client-side filtering for search and type selection
                 final filteredReports =
                     reports.where((report) {
-                      // Filter by type (lost/found)
+                      // Filter by selected type (lost/found)
                       if (selectedType != report.type) return false;
 
-                      // Filter by search query
+                      // Filter by search query if text is entered
                       if (_searchController.text.isNotEmpty) {
                         final query = _searchController.text.toLowerCase();
                         return report.title.toLowerCase().contains(query) ||
@@ -120,18 +167,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       return true;
                     }).toList();
 
+                // Display reports in a responsive grid layout
                 return GridView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
+                    crossAxisCount: 2, // 2 columns for responsive layout
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
-                    childAspectRatio: 0.8,
+                    childAspectRatio: 0.8, // Card aspect ratio
                   ),
                   itemCount: filteredReports.length,
                   itemBuilder: (context, index) {
                     return ReportCard(
                       report: filteredReports[index],
+                      // Navigate to report detail screen on tap
                       onTap:
                           () => Navigator.push(
                             context,
@@ -142,6 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                             ),
                           ),
+                      // Navigate to edit screen for report modification
                       onEdit:
                           () => Navigator.push(
                             context,
@@ -152,6 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                             ),
                           ),
+                      // Handle report deletion with confirmation
                       onDelete: () async {
                         final shouldDelete = await showConfirmationDialog(
                           context,
@@ -163,9 +214,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
 
                         if (shouldDelete == true) {
+                          // Delete report from database
                           await firestore.deleteReport(
                             filteredReports[index].id,
                           );
+                          // Show success message
                           showSuccessDialog(
                             context,
                             title: 'Success!',
@@ -173,6 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         }
                       },
+                      // Handle report resolution with confirmation
                       onResolve: () async {
                         final shouldResolve = await showConfirmationDialog(
                           context,
@@ -184,9 +238,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
 
                         if (shouldResolve == true) {
+                          // Mark report as resolved in database
                           await firestore.markResolved(
                             filteredReports[index].id,
                           );
+                          // Show success message
                           showSuccessDialog(
                             context,
                             title: 'Success!',
@@ -202,6 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+      // Floating action button for creating new reports
       floatingActionButton: Container(
         width: 60,
         height: 60,
@@ -213,6 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: FloatingActionButton(
           backgroundColor: Colors.transparent,
           elevation: 0,
+          // Navigate to report creation screen
           onPressed:
               () => Navigator.push(
                 context,
@@ -225,10 +283,26 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /**
+   * Build toggle option for lost/found filter
+   * 
+   * Creates a selectable button for filtering reports by type.
+   * Handles visual feedback for selected state and user interaction.
+   * 
+   * Parameters:
+   * - value: String - The filter value ('lost' or 'found')
+   * - label: String - Display text for the toggle option
+   * 
+   * Returns: Widget - A clickable toggle button
+   * 
+   * Visual States:
+   * - Selected: Purple background with white text
+   * - Unselected: Transparent background with grey text
+   */
   Widget _buildToggleOption(String value, String label) {
     final isSelected = selectedType == value;
     return GestureDetector(
-      onTap: () => setState(() => selectedType = value),
+      onTap: () => setState(() => selectedType = value), // Update state on tap
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(

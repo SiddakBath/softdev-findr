@@ -1,14 +1,57 @@
+/**
+ * report_card.dart
+ * 
+ * Report card widget for displaying lost and found items
+ * 
+ * Creates visual card representation of reports with image display,
+ * color coding, and owner-specific action menu.
+ * 
+ * Author: [Your Name]
+ * Created: [Date]
+ * Last Modified: [Date]
+ */
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/report.dart';
 
+/**
+ * Report card widget for displaying lost and found items
+ * 
+ * Creates a card-based UI component that displays report information in a
+ * visually appealing format. Supports user interactions and owner-specific
+ * actions through a context menu.
+ * 
+ * Widget Structure:
+ * - Image section (top 60% of card)
+ * - Content section (bottom 40% of card)
+ * - Action menu (owner-only, top-right corner)
+ * 
+ * Interaction Features:
+ * - Tap to view report details
+ * - Owner menu for edit/delete/resolve actions
+ * - Visual feedback for user interactions
+ */
 class ReportCard extends StatelessWidget {
+  // Report data to display
   final Report report;
-  final VoidCallback? onTap;
-  final VoidCallback? onDelete;
-  final VoidCallback? onEdit;
-  final VoidCallback? onResolve;
 
+  // Callback functions for user interactions
+  final VoidCallback? onTap; // Navigate to detail view
+  final VoidCallback? onDelete; // Delete report
+  final VoidCallback? onEdit; // Edit report
+  final VoidCallback? onResolve; // Mark as resolved
+
+  /**
+   * Constructor for ReportCard widget
+   * 
+   * Parameters:
+   * - report: Report - The report data to display
+   * - onTap: VoidCallback? - Optional callback for tap interaction
+   * - onDelete: VoidCallback? - Optional callback for delete action
+   * - onEdit: VoidCallback? - Optional callback for edit action
+   * - onResolve: VoidCallback? - Optional callback for resolve action
+   */
   ReportCard({
     required this.report,
     this.onTap,
@@ -17,6 +60,14 @@ class ReportCard extends StatelessWidget {
     this.onResolve,
   });
 
+  /**
+   * Check if current user is the owner of this report
+   * 
+   * Compares the current user's email with the report's reporter email
+   * to determine ownership for action permissions.
+   * 
+   * Returns: bool - True if current user is the report owner
+   */
   bool get isOwner {
     final currentUser = FirebaseAuth.instance.currentUser;
     return currentUser?.email == report.reporterEmail;
@@ -25,7 +76,7 @@ class ReportCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: onTap, // Handle tap to navigate to detail view
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -35,13 +86,13 @@ class ReportCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image at the top
+            // Image section (top 60% of card)
             Expanded(
               flex: 3,
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: _getImageColor(),
+                  color: _getImageColor(), // Background color for image area
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(12),
                     topRight: Radius.circular(12),
@@ -49,6 +100,7 @@ class ReportCard extends StatelessWidget {
                 ),
                 child: Stack(
                   children: [
+                    // Display report image or placeholder
                     report.imageUrl != null
                         ? ClipRRect(
                           borderRadius: const BorderRadius.only(
@@ -61,13 +113,12 @@ class ReportCard extends StatelessWidget {
                             width: double.infinity,
                             height: double.infinity,
                             errorBuilder: (context, error, stackTrace) {
-                              return _buildImagePlaceholder();
+                              return _buildImagePlaceholder(); // Fallback on error
                             },
                           ),
                         )
-                        : _buildImagePlaceholder(),
-
-                    // Menu button (three dots) - only show if user is owner
+                        : _buildImagePlaceholder(), // Show placeholder if no image
+                    // Owner action menu (three dots) - only visible to report owner
                     if (isOwner &&
                         (onEdit != null ||
                             onDelete != null ||
@@ -77,7 +128,9 @@ class ReportCard extends StatelessWidget {
                         right: 8,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.white.withOpacity(
+                              0.8,
+                            ), // Semi-transparent background
                             shape: BoxShape.circle,
                           ),
                           child: PopupMenuButton<String>(
@@ -87,6 +140,7 @@ class ReportCard extends StatelessWidget {
                               size: 20,
                             ),
                             onSelected: (value) {
+                              // Handle menu item selection
                               switch (value) {
                                 case 'edit':
                                   onEdit?.call();
@@ -101,6 +155,7 @@ class ReportCard extends StatelessWidget {
                             },
                             itemBuilder:
                                 (context) => [
+                                  // Resolve option (only if not already resolved)
                                   if (onResolve != null && !report.resolved)
                                     PopupMenuItem(
                                       value: 'resolve',
@@ -112,6 +167,7 @@ class ReportCard extends StatelessWidget {
                                         ],
                                       ),
                                     ),
+                                  // Edit option
                                   if (onEdit != null)
                                     PopupMenuItem(
                                       value: 'edit',
@@ -123,6 +179,7 @@ class ReportCard extends StatelessWidget {
                                         ],
                                       ),
                                     ),
+                                  // Delete option (with red styling)
                                   if (onDelete != null)
                                     PopupMenuItem(
                                       value: 'delete',
@@ -150,7 +207,7 @@ class ReportCard extends StatelessWidget {
               ),
             ),
 
-            // Content section
+            // Content section (bottom 40% of card)
             Expanded(
               flex: 2,
               child: Padding(
@@ -158,7 +215,7 @@ class ReportCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title
+                    // Report title
                     Text(
                       report.title,
                       style: const TextStyle(
@@ -166,27 +223,28 @@ class ReportCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1, // Limit to single line
+                      overflow:
+                          TextOverflow.ellipsis, // Show ellipsis if truncated
                     ),
 
                     const SizedBox(height: 6),
 
-                    // Description
+                    // Report description
                     Text(
                       report.description,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
-                        height: 1.3,
+                        height: 1.3, // Line height for better readability
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2, // Limit to two lines
+                      overflow:
+                          TextOverflow.ellipsis, // Show ellipsis if truncated
                     ),
 
-                    const Spacer(),
-
-                    // Tags at the bottom
+                    const Spacer(), // Push tags to bottom
+                    // Tags display (limited to first 3 tags)
                     Wrap(
                       spacing: 4,
                       runSpacing: 4,
@@ -198,7 +256,8 @@ class ReportCard extends StatelessWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.grey[200],
+                                color:
+                                    Colors.grey[200], // Light grey background
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
@@ -221,21 +280,45 @@ class ReportCard extends StatelessWidget {
     );
   }
 
+  /**
+   * Build placeholder widget when no image is available
+   * 
+   * Creates a visual placeholder with an icon when the report doesn't have
+   * an associated image or when image loading fails.
+   * 
+   * Returns: Widget - Placeholder container with image icon
+   */
   Widget _buildImagePlaceholder() {
     return Container(
       width: double.infinity,
       height: double.infinity,
       decoration: BoxDecoration(
-        color: _getImageColor(),
+        color: _getImageColor(), // Use same color as image background
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),
         ),
       ),
-      child: Icon(Icons.image, color: Colors.white, size: 40),
+      child: Icon(
+        Icons.image,
+        color: Colors.white,
+        size: 40,
+      ), // Image placeholder icon
     );
   }
 
+  /**
+   * Get background color for image section based on report color
+   * 
+   * Maps the report's color field to Flutter colors, with fallback
+   * to a hash-based color generation for unknown colors.
+   * 
+   * Returns: Color - Background color for the image section
+   * 
+   * Color Mapping:
+   * - Standard colors: blue, yellow, grey, red, green, purple, orange
+   * - Fallback: Hash-based color from predefined palette
+   */
   Color _getImageColor() {
     // Use the report's colour field or generate a color based on the title
     switch (report.colour.toLowerCase()) {
@@ -255,7 +338,7 @@ class ReportCard extends StatelessWidget {
       case 'orange':
         return Colors.orange[300]!;
       default:
-        // Generate a color based on the title hash
+        // Generate a color based on the title hash for consistency
         final hash = report.title.hashCode;
         final colors = [
           Colors.blue[300]!,
@@ -265,7 +348,8 @@ class ReportCard extends StatelessWidget {
           Colors.red[300]!,
           Colors.teal[300]!,
         ];
-        return colors[hash.abs() % colors.length];
+        return colors[hash.abs() %
+            colors.length]; // Use modulo for consistent color selection
     }
   }
 }

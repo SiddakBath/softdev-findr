@@ -1,45 +1,120 @@
+/**
+ * login_screen.dart
+ * 
+ * User authentication login screen
+ * 
+ * Provides login interface with form validation and error handling.
+ * Includes navigation to signup screen for new users.
+ * 
+ * Author: [Your Name]
+ * Created: [Date]
+ * Last Modified: [Date]
+ */
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import 'home_screen.dart';
 import 'signup_screen.dart';
 
+/**
+ * Login screen widget for user authentication
+ * 
+ * Provides a clean, user-friendly interface for existing users to log in
+ * to the Findr application. Handles form state, validation, and authentication
+ * flow with proper error handling and loading states.
+ * 
+ * Navigation Flow:
+ * - Successful login: Automatically navigates to HomeScreen via AuthWrapper
+ * - Failed login: Displays error message and allows retry
+ * - Sign up link: Navigates to SignupScreen for new user registration
+ */
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
+/**
+ * State class for the login screen
+ * 
+ * Manages the login form state including:
+ * - Email and password input controllers
+ * - Form validation state
+ * - Loading state during authentication
+ * - Error message display
+ * - Authentication service integration
+ * 
+ * State Variables:
+ * - emailController: TextEditingController for email input
+ * - passwordController: TextEditingController for password input
+ * - formKey: GlobalKey<FormState> for form validation
+ * - _authService: AuthService instance for authentication
+ * - errorMessage: String? for displaying authentication errors
+ * - isLoading: bool for showing loading state during authentication
+ */
 class _LoginScreenState extends State<LoginScreen> {
+  // Form input controllers
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final formKey = GlobalKey<FormState>();
-  final AuthService _authService = AuthService();
-  String? errorMessage;
-  bool isLoading = false;
 
+  // Form validation key
+  final formKey = GlobalKey<FormState>();
+
+  // Authentication service instance
+  final AuthService _authService = AuthService();
+
+  // UI state variables
+  String? errorMessage; // Error message to display
+  bool isLoading = false; // Loading state during authentication
+
+  /**
+   * Handle user login authentication
+   * 
+   * Validates the form inputs and attempts to authenticate the user
+   * with Firebase Auth. Handles loading states and error display.
+   * 
+   * Authentication Flow:
+   * 1. Validate form inputs
+   * 2. Set loading state to true
+   * 3. Clear any previous error messages
+   * 4. Attempt authentication with Firebase
+   * 5. Handle success (navigation handled by AuthWrapper)
+   * 6. Handle errors with user-friendly messages
+   * 7. Reset loading state
+   * 
+   * Error Handling:
+   * - Displays user-friendly error messages
+   * - Maintains form state for retry
+   * - Handles network connectivity issues
+   */
   void login() async {
+    // Validate form before attempting authentication
     if (formKey.currentState!.validate()) {
       setState(() {
-        isLoading = true;
-        errorMessage = null;
+        isLoading = true; // Show loading indicator
+        errorMessage = null; // Clear previous errors
       });
 
       try {
+        // Attempt authentication with provided credentials
         await _authService.signInWithEmailAndPassword(
-          emailController.text.trim(),
-          passwordController.text.trim(),
+          emailController.text.trim(), // Remove whitespace from email
+          passwordController.text.trim(), // Remove whitespace from password
         );
-        // Navigation is now handled by AuthWrapper
+        // Navigation is now handled by AuthWrapper in main.dart
+        // Successful login will automatically navigate to HomeScreen
       } catch (e) {
+        // Handle authentication errors
         if (mounted) {
           setState(() {
-            errorMessage = e.toString();
+            errorMessage = e.toString(); // Display error message
           });
         }
       } finally {
+        // Reset loading state regardless of success/failure
         if (mounted) {
           setState(() {
-            isLoading = false;
+            isLoading = false; // Hide loading indicator
           });
         }
       }
@@ -64,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Title
+                // Application title
                 const Text(
                   'Login',
                   style: TextStyle(
@@ -76,12 +151,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // Error message
+                // Error message display
                 if (errorMessage != null) ...[
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.red[50],
+                      color: Colors.red[50], // Light red background
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.red[200]!),
                     ),
@@ -94,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 16),
                 ],
 
-                // Email field
+                // Email input field
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -122,15 +197,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             vertical: 12,
                           ),
                         ),
-                        validator: (v) => v!.isEmpty ? 'Enter email' : null,
-                        enabled: !isLoading,
+                        validator:
+                            (v) =>
+                                v!.isEmpty
+                                    ? 'Enter email'
+                                    : null, // Form validation
+                        enabled: !isLoading, // Disable during authentication
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
 
-                // Password field
+                // Password input field
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -158,20 +237,25 @@ class _LoginScreenState extends State<LoginScreen> {
                             vertical: 12,
                           ),
                         ),
-                        obscureText: true,
-                        validator: (v) => v!.isEmpty ? 'Enter password' : null,
-                        enabled: !isLoading,
+                        obscureText: true, // Hide password characters
+                        validator:
+                            (v) =>
+                                v!.isEmpty
+                                    ? 'Enter password'
+                                    : null, // Form validation
+                        enabled: !isLoading, // Disable during authentication
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 32),
 
-                // Submit button
+                // Login submit button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: isLoading ? null : login,
+                    onPressed:
+                        isLoading ? null : login, // Disable during loading
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.purple[600],
                       foregroundColor: Colors.white,
@@ -202,7 +286,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Sign up link
+                // Navigation to signup screen
                 TextButton(
                   onPressed:
                       isLoading

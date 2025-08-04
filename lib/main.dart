@@ -1,3 +1,16 @@
+/**
+ * main.dart
+ * 
+ * Main entry point for the Findr Lost & Found application
+ * 
+ * Handles Firebase initialization and authentication routing.
+ * Routes users to HomeScreen if authenticated, LoginScreen if not.
+ * 
+ * Author: [Your Name]
+ * Created: [Date]
+ * Last Modified: [Date]
+ */
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -5,35 +18,65 @@ import 'firebase_options.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 
+/**
+ * Main application entry point
+ * 
+ * Initializes Firebase and starts the Flutter application
+ * 
+ * Returns: void
+ */
 void main() async {
+  // Ensure Flutter bindings are initialized before Firebase
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase with platform-specific options
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Start the application
   runApp(MyApp());
 }
 
+/**
+ * Root application widget
+ * 
+ * Configures the MaterialApp with theme settings and routing logic.
+ * Uses AuthWrapper to handle authentication state and determine which screen to show.
+ */
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Lost & Found',
-      theme: ThemeData(primarySwatch: Colors.deepPurple),
-      debugShowCheckedModeBanner: false,
-      home: AuthWrapper(),
+      title: 'Lost & Found', // App title displayed in task manager
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+      ), // Purple theme for consistency
+      debugShowCheckedModeBanner: false, // Hide debug banner in release builds
+      home: AuthWrapper(), // Use AuthWrapper to handle authentication routing
     );
   }
 }
 
+/**
+ * Authentication state wrapper
+ * 
+ * Monitors Firebase authentication state and routes users to appropriate screens:
+ * - If user is authenticated: HomeScreen (main app interface)
+ * - If user is not authenticated: LoginScreen (authentication interface)
+ * 
+ * Uses StreamBuilder to listen to real-time authentication state changes
+ */
 class AuthWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
+      // Listen to Firebase authentication state changes
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // If the snapshot has user data, then the user is already signed in
+        // Check if user data exists and is not null (user is signed in)
         if (snapshot.hasData && snapshot.data != null) {
-          return HomeScreen();
+          return HomeScreen(); // Navigate to main app interface
         }
-        // Otherwise, the user is not signed in
+        // User is not signed in, show login screen
         return LoginScreen();
       },
     );

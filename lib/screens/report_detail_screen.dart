@@ -1,3 +1,16 @@
+/**
+ * report_detail_screen.dart
+ * 
+ * Detailed view screen for lost and found reports
+ * 
+ * Displays complete report information in organized sections.
+ * Provides owner-specific actions for editing and deleting reports.
+ * 
+ * Author: [Your Name]
+ * Created: [Date]
+ * Last Modified: [Date]
+ */
+
 import 'package:findr/models/report.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,12 +20,40 @@ import '../widgets/success_dialog.dart';
 import '../widgets/confirmation_dialog.dart';
 import 'report_form_screen.dart';
 
+/**
+ * Report detail screen for viewing complete report information
+ * 
+ * Displays all information about a lost or found item in an organized,
+ * visually appealing format. Provides owner-specific actions for
+ * report management and contact options for resolution.
+ * 
+ * Screen Layout:
+ * - App bar with title and owner actions
+ * - Scrollable content with organized sections
+ * - Image section with color-coded background
+ * - Action button for contact/resolution
+ * - Information sections for all report data
+ * 
+ * Owner Features:
+ * - Edit report button
+ * - Delete report button with confirmation
+ * - Direct access to report modification
+ */
 class ReportDetailScreen extends StatelessWidget {
-  final Report report;
-  final FirestoreService _firestoreService = FirestoreService();
+  final Report report; // Report data to display
+  final FirestoreService _firestoreService =
+      FirestoreService(); // Database service
 
   ReportDetailScreen({super.key, required this.report});
 
+  /**
+   * Check if current user is the owner of this report
+   * 
+   * Compares the current user's email with the report's reporter email
+   * to determine ownership for action permissions.
+   * 
+   * Returns: bool - True if current user is the report owner
+   */
   bool get isOwner {
     final currentUser = FirebaseAuth.instance.currentUser;
     return currentUser?.email == report.reporterEmail;
@@ -27,7 +68,7 @@ class ReportDetailScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(context).pop(), // Navigate back
         ),
         title: Text(
           report.title,
@@ -39,6 +80,7 @@ class ReportDetailScreen extends StatelessWidget {
         actions:
             isOwner
                 ? [
+                  // Delete button (owner only)
                   IconButton(
                     icon: const Icon(Icons.delete_outline, color: Colors.red),
                     onPressed: () async {
@@ -62,6 +104,7 @@ class ReportDetailScreen extends StatelessWidget {
                       }
                     },
                   ),
+                  // Edit button (owner only)
                   IconButton(
                     icon: const Icon(Icons.edit_outlined, color: Colors.blue),
                     onPressed: () {
@@ -80,19 +123,19 @@ class ReportDetailScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
           const SizedBox(height: 24),
-          _buildItemImage(),
+          _buildItemImage(), // Display item image or placeholder
           const SizedBox(height: 24),
-          _buildActionButton(),
+          _buildActionButton(), // Contact or resolve action
           const SizedBox(height: 32),
-          _buildDescriptionSection(),
+          _buildDescriptionSection(), // Item description
           const SizedBox(height: 32),
-          _buildDateTimeSection(),
+          _buildDateTimeSection(), // When item was lost/found
           const SizedBox(height: 32),
-          _buildTagsSection(),
+          _buildTagsSection(), // Searchable tags
           const SizedBox(height: 32),
-          _buildColorSection(),
+          _buildColorSection(), // Visual color representation
           const SizedBox(height: 32),
-          _buildLocationSection(),
+          _buildLocationSection(), // Where item was lost/found
           const SizedBox(height: 32),
         ],
       ),
