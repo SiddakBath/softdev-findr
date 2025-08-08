@@ -6,9 +6,9 @@
  * Provides login interface with form validation and error handling.
  * Includes navigation to signup screen for new users.
  * 
- * Author: [Your Name]
- * Created: [Date]
- * Last Modified: [Date]
+ * Author: Siddak Bath
+ * Created: [17/07/2025]
+ * Last Modified: [05/08/2025]
  */
 
 import 'package:flutter/material.dart';
@@ -70,22 +70,16 @@ class _LoginScreenState extends State<LoginScreen> {
   /**
    * Handle user login authentication
    * 
-   * Validates the form inputs and attempts to authenticate the user
-   * with Firebase Auth. Handles loading states and error display.
-   * 
-   * Authentication Flow:
-   * 1. Validate form inputs
-   * 2. Set loading state to true
-   * 3. Clear any previous error messages
-   * 4. Attempt authentication with Firebase
-   * 5. Handle success (navigation handled by AuthWrapper)
-   * 6. Handle errors with user-friendly messages
-   * 7. Reset loading state
-   * 
-   * Error Handling:
-   * - Displays user-friendly error messages
-   * - Maintains form state for retry
-   * - Handles network connectivity issues
+   * Input: None (uses form controllers)
+   * Processing: 
+   * - Validate form inputs
+   * - Set loading state to true
+   * - Clear any previous error messages
+   * - Attempt authentication with Firebase
+   * - Handle success (navigation handled by AuthWrapper)
+   * - Handle errors with user-friendly messages
+   * - Reset loading state
+   * Output: void (none)
    */
   void login() async {
     // Validate form before attempting authentication
@@ -121,6 +115,17 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /**
+   * Build the login screen UI
+   * 
+   * Input: BuildContext context
+   * Processing: 
+   * - Create scaffold with app bar
+   * - Build form with email and password fields
+   * - Add validation and error handling
+   * - Include loading states and navigation
+   * Output: Widget - Complete login screen interface
+   */
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -189,19 +194,25 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: TextFormField(
                         controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
                         decoration: const InputDecoration(
                           hintText: 'example@example.com',
+                          helperText: 'Format: name@example.com',
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 12,
                           ),
                         ),
-                        validator:
-                            (v) =>
-                                v!.isEmpty
-                                    ? 'Enter email'
-                                    : null, // Form validation
+                        validator: (v) {
+                          if (v == null || v.isEmpty) return 'Enter email';
+                          final emailRegex = RegExp(
+                            r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                          );
+                          if (!emailRegex.hasMatch(v))
+                            return 'Enter a valid email address';
+                          return null;
+                        },
                         enabled: !isLoading, // Disable during authentication
                       ),
                     ),

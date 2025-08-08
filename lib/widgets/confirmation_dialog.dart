@@ -6,9 +6,9 @@
  * Provides reusable confirmation dialog with customizable text and styling.
  * Includes helper function for easy dialog display.
  * 
- * Author: [Your Name]
- * Created: [Date]
- * Last Modified: [Date]
+ * Author: Siddak Bath
+ * Created: [17/07/2025]
+ * Last Modified: [05/08/2025]
  */
 
 import 'package:flutter/material.dart';
@@ -41,14 +41,9 @@ class ConfirmationDialog extends StatelessWidget {
   /**
    * Constructor for ConfirmationDialog widget
    * 
-   * Parameters:
-   * - key: Key? - Widget key for identification
-   * - title: String - Dialog title (default: 'Are you sure?')
-   * - message: String - Dialog message (default: 'This action cannot be undone.')
-   * - confirmText: String - Confirm button text (default: 'Yes')
-   * - cancelText: String - Cancel button text (default: 'Cancel')
-   * - onConfirm: VoidCallback? - Optional callback for confirm action
-   * - onCancel: VoidCallback? - Optional callback for cancel action
+   * Input: Key? key, String title, message, confirmText, cancelText, VoidCallback? onConfirm, onCancel
+   * Processing: Initialize ConfirmationDialog with dialog content and callback functions
+   * Output: ConfirmationDialog instance
    */
   const ConfirmationDialog({
     Key? key,
@@ -60,6 +55,17 @@ class ConfirmationDialog extends StatelessWidget {
     this.onCancel,
   }) : super(key: key);
 
+  /**
+   * Build the confirmation dialog UI
+   * 
+   * Input: BuildContext context
+   * Processing: 
+   * - Create modal dialog with custom styling
+   * - Display title and message
+   * - Add confirm and cancel buttons
+   * - Handle button interactions with callbacks
+   * Output: Widget - Complete confirmation dialog interface
+   */
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -174,38 +180,12 @@ class ConfirmationDialog extends StatelessWidget {
 /**
  * Helper function to show confirmation dialog
  * 
- * Convenience function that creates and displays a confirmation dialog
- * with the specified parameters. Returns a Future<bool?> that resolves
- * to true if confirmed, false if cancelled, or null if dismissed.
- * 
- * Parameters:
- * - context: BuildContext - The build context for showing the dialog
- * - title: String - Dialog title (default: 'Are you sure?')
- * - message: String - Dialog message (default: 'This action cannot be undone.')
- * - confirmText: String - Confirm button text (default: 'Yes')
- * - cancelText: String - Cancel button text (default: 'Cancel')
- * - onConfirm: VoidCallback? - Optional callback for confirm action
- * - onCancel: VoidCallback? - Optional callback for cancel action
- * 
- * Returns: Future<bool?> - Future that resolves to:
- * - true: User confirmed the action
- * - false: User cancelled the action
- * - null: Dialog was dismissed
- * 
- * Usage Example:
- * ```dart
- * final shouldDelete = await showConfirmationDialog(
- *   context,
- *   title: 'Delete Report',
- *   message: 'Are you sure you want to delete this report?',
- *   confirmText: 'Delete',
- *   cancelText: 'Cancel',
- * );
- * 
- * if (shouldDelete == true) {
- *   // Proceed with deletion
- * }
- * ```
+ * Input: BuildContext context, String title, message, confirmText, cancelText, VoidCallback? onConfirm, onCancel
+ * Processing: 
+ * - Create and display confirmation dialog
+ * - Handle dialog dismissal and return values
+ * - Execute optional callbacks based on user action
+ * Output: Future<bool?> - Future that resolves to true (confirmed), false (cancelled), or null (dismissed)
  */
 Future<bool?> showConfirmationDialog(
   BuildContext context, {

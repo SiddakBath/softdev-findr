@@ -6,9 +6,9 @@
  * Creates visual card representation of reports with image display,
  * color coding, and owner-specific action menu.
  * 
- * Author: [Your Name]
- * Created: [Date]
- * Last Modified: [Date]
+ * Author: Siddak Bath
+ * Created: [17/07/2025]
+ * Last Modified: [05/08/2025]
  */
 
 import 'package:flutter/material.dart';
@@ -45,12 +45,9 @@ class ReportCard extends StatelessWidget {
   /**
    * Constructor for ReportCard widget
    * 
-   * Parameters:
-   * - report: Report - The report data to display
-   * - onTap: VoidCallback? - Optional callback for tap interaction
-   * - onDelete: VoidCallback? - Optional callback for delete action
-   * - onEdit: VoidCallback? - Optional callback for edit action
-   * - onResolve: VoidCallback? - Optional callback for resolve action
+   * Input: Report report, VoidCallback? onTap, onDelete, onEdit, onResolve
+   * Processing: Initialize ReportCard with report data and callback functions
+   * Output: ReportCard instance
    */
   ReportCard({
     required this.report,
@@ -63,16 +60,26 @@ class ReportCard extends StatelessWidget {
   /**
    * Check if current user is the owner of this report
    * 
-   * Compares the current user's email with the report's reporter email
-   * to determine ownership for action permissions.
-   * 
-   * Returns: bool - True if current user is the report owner
+   * Input: None (uses Firebase Auth and report data)
+   * Processing: Compare current user's email with report's reporter email
+   * Output: bool - True if current user is the report owner
    */
   bool get isOwner {
     final currentUser = FirebaseAuth.instance.currentUser;
     return currentUser?.email == report.reporterEmail;
   }
 
+  /**
+   * Build the report card UI
+   * 
+   * Input: BuildContext context
+   * Processing: 
+   * - Create card container with image and content sections
+   * - Display report image or placeholder
+   * - Show owner action menu if applicable
+   * - Build content section with title, description, and tags
+   * Output: Widget - Complete report card interface
+   */
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -283,10 +290,12 @@ class ReportCard extends StatelessWidget {
   /**
    * Build placeholder widget when no image is available
    * 
-   * Creates a visual placeholder with an icon when the report doesn't have
-   * an associated image or when image loading fails.
-   * 
-   * Returns: Widget - Placeholder container with image icon
+   * Input: None (uses report data)
+   * Processing: 
+   * - Create visual placeholder with icon
+   * - Use same background color as image section
+   * - Handle cases when image is not available or loading fails
+   * Output: Widget - Placeholder container with image icon
    */
   Widget _buildImagePlaceholder() {
     return Container(
@@ -310,14 +319,12 @@ class ReportCard extends StatelessWidget {
   /**
    * Get background color for image section based on report color
    * 
-   * Maps the report's color field to Flutter colors, with fallback
-   * to a hash-based color generation for unknown colors.
-   * 
-   * Returns: Color - Background color for the image section
-   * 
-   * Color Mapping:
-   * - Standard colors: blue, yellow, grey, red, green, purple, orange
-   * - Fallback: Hash-based color from predefined palette
+   * Input: None (uses report data)
+   * Processing: 
+   * - Map report's color field to Flutter colors
+   * - Use hash-based color generation for unknown colors
+   * - Provide fallback to predefined color palette
+   * Output: Color - Background color for the image section
    */
   Color _getImageColor() {
     // Use the report's colour field or generate a color based on the title

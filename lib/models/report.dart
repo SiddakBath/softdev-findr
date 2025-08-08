@@ -6,9 +6,9 @@
  * Contains all report information and provides conversion methods
  * between Firestore documents and Dart objects.
  * 
- * Author: [Your Name]
- * Created: [Date]
- * Last Modified: [Date]
+ * Author: Siddak Bath
+ * Created: [17/07/2025]
+ * Last Modified: [05/08/2025]
  */
 
 /**
@@ -54,20 +54,9 @@ class Report {
   /**
    * Constructor for creating a new Report instance
    * 
-   * Parameters:
-   * - id: String - Unique identifier
-   * - title: String - Item title
-   * - type: String - 'lost' or 'found'
-   * - description: String - Item description
-   * - tags: List<String> - Search keywords
-   * - colour: String - Item color
-   * - timeFoundLost: DateTime - When item was lost/found
-   * - location: String - Location of loss/finding
-   * - reporterName: String - Reporter's name
-   * - reporterEmail: String - Reporter's email
-   * - imageUrl: String? - Optional photo URL
-   * - resolved: bool - Resolution status
-   * - createdAt: DateTime - Creation timestamp
+   * Input: All required report parameters (id, title, type, description, tags, colour, timeFoundLost, location, reporterName, reporterEmail, resolved, createdAt) and optional imageUrl
+   * Processing: Initialize Report object with provided parameters
+   * Output: Report instance
    */
   Report({
     required this.id,
@@ -88,19 +77,12 @@ class Report {
   /**
    * Factory constructor to create Report from Firestore document
    * 
-   * Converts a Firestore document snapshot into a Report object.
-   * Handles data type conversions and provides default values for missing fields.
-   * 
-   * Parameters:
-   * - id: String - Document ID from Firestore
-   * - data: Map<String, dynamic> - Document data from Firestore
-   * 
-   * Returns: Report - New Report instance
-   * 
-   * Data Conversions:
-   * - DateTime fields are parsed from ISO 8601 strings
-   * - tags list is converted from dynamic to List<String>
-   * - imageUrl remains nullable if not present
+   * Input: String id, Map<String, dynamic> data
+   * Processing: 
+   * - Convert Firestore document data to Report object
+   * - Handle data type conversions (DateTime parsing, List conversion)
+   * - Provide default values for missing fields
+   * Output: Report - New Report instance
    */
   factory Report.fromMap(String id, Map<String, dynamic> data) {
     return Report(
@@ -127,14 +109,12 @@ class Report {
   /**
    * Convert Report object to Firestore document format
    * 
-   * Converts the Report object into a Map that can be stored in Firestore.
-   * Handles DateTime serialization to ISO 8601 strings for Firestore compatibility.
-   * 
-   * Returns: Map<String, dynamic> - Firestore-compatible document data
-   * 
-   * Data Conversions:
-   * - DateTime objects converted to ISO 8601 strings
-   * - All other fields remain as-is for Firestore storage
+   * Input: None (uses instance data)
+   * Processing: 
+   * - Convert Report object to Map format
+   * - Serialize DateTime objects to ISO 8601 strings
+   * - Prepare data for Firestore storage
+   * Output: Map<String, dynamic> - Firestore-compatible document data
    */
   Map<String, dynamic> toMap() {
     return {

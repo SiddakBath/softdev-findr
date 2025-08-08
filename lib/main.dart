@@ -6,9 +6,9 @@
  * Handles Firebase initialization and authentication routing.
  * Routes users to HomeScreen if authenticated, LoginScreen if not.
  * 
- * Author: [Your Name]
- * Created: [Date]
- * Last Modified: [Date]
+ * Author: Siddak Bath
+ * Created: [17/07/2025]
+ * Last Modified: [05/08/2025]
  */
 
 import 'package:flutter/material.dart';
@@ -21,9 +21,12 @@ import 'screens/home_screen.dart';
 /**
  * Main application entry point
  * 
- * Initializes Firebase and starts the Flutter application
- * 
- * Returns: void
+ * Input: None
+ * Processing: 
+ * - Initialize Flutter bindings
+ * - Initialize Firebase with platform-specific options
+ * - Start the Flutter application
+ * Output: void (none)
  */
 void main() async {
   // Ensure Flutter bindings are initialized before Firebase
@@ -39,8 +42,9 @@ void main() async {
 /**
  * Root application widget
  * 
- * Configures the MaterialApp with theme settings and routing logic.
- * Uses AuthWrapper to handle authentication state and determine which screen to show.
+ * Input: BuildContext context
+ * Processing: Configure MaterialApp with theme settings and routing logic
+ * Output: MaterialApp widget
  */
 class MyApp extends StatelessWidget {
   @override
@@ -59,11 +63,11 @@ class MyApp extends StatelessWidget {
 /**
  * Authentication state wrapper
  * 
- * Monitors Firebase authentication state and routes users to appropriate screens:
- * - If user is authenticated: HomeScreen (main app interface)
- * - If user is not authenticated: LoginScreen (authentication interface)
- * 
- * Uses StreamBuilder to listen to real-time authentication state changes
+ * Input: BuildContext context
+ * Processing: 
+ * - Monitor Firebase authentication state changes
+ * - Route users based on authentication status
+ * Output: Widget - HomeScreen if authenticated, LoginScreen if not
  */
 class AuthWrapper extends StatelessWidget {
   @override

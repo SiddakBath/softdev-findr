@@ -6,9 +6,9 @@
  * Provides comprehensive form interface for creating and editing reports.
  * Includes image upload, color selection, and form validation.
  * 
- * Author: [Your Name]
- * Created: [Date]
- * Last Modified: [Date]
+ * Author: Siddak Bath
+ * Created: [17/07/2025]
+ * Last Modified: [05/08/2025]
  */
 
 import 'package:flutter/material.dart';
@@ -89,6 +89,16 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   File? selectedImage;
   final ImagePicker _picker = ImagePicker();
 
+  /**
+   * Initialize form with existing report data if editing
+   * 
+   * Input: None (uses widget.report)
+   * Processing: 
+   * - Populate form controllers with existing report data
+   * - Set form state variables from report
+   * - Update color selection based on report color
+   * Output: void (none)
+   */
   @override
   void initState() {
     super.initState();
@@ -114,10 +124,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   /**
    * Pick image from device gallery
    * 
-   * Opens the device image picker to select an image from the gallery.
-   * Updates the selectedImage state when an image is chosen.
-   * 
-   * Returns: Future<void> - Completes when image selection is finished
+   * Input: None
+   * Processing: 
+   * - Open device image picker
+   * - Select image from gallery
+   * - Convert XFile to File object
+   * - Update selectedImage state
+   * Output: Future<void> - Completes when image selection is finished
    */
   Future<void> _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -131,15 +144,12 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   /**
    * Update selected color based on color text input
    * 
-   * Parses color text (hex code or color name) and updates the
-   * selectedColor state for visual feedback in the color picker.
-   * 
-   * Parameters:
-   * - colorText: String - Color value as text (hex or name)
-   * 
-   * Color Support:
-   * - Hex colors: #RRGGBB format
-   * - Named colors: red, blue, green, yellow, purple, orange, pink, brown, grey
+   * Input: String colorText
+   * Processing: 
+   * - Parse color text (hex code or color name)
+   * - Convert to Flutter Color object
+   * - Update selectedColor state for visual feedback
+   * Output: void (none)
    */
   void _updateSelectedColor(String colorText) {
     if (colorText.isNotEmpty) {
@@ -192,6 +202,18 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     }
   }
 
+  /**
+   * Submit form data to create or update report
+   * 
+   * Input: None (uses form controllers)
+   * Processing: 
+   * - Validate form inputs
+   * - Parse tags from comma-separated string
+   * - Create Report object with form data
+   * - Submit to Firestore service
+   * - Handle success/error responses
+   * Output: void (none)
+   */
   void submit() {
     if (!formKey.currentState!.validate()) return;
 
@@ -252,6 +274,15 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         });
   }
 
+  /**
+   * Show date picker dialog
+   * 
+   * Input: None
+   * Processing: 
+   * - Display date picker dialog
+   * - Update selectedDate state if date is selected
+   * Output: Future<void> - Completes when date selection is finished
+   */
   Future<void> _selectDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -266,6 +297,15 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     }
   }
 
+  /**
+   * Show time picker dialog
+   * 
+   * Input: None
+   * Processing: 
+   * - Display time picker dialog
+   * - Update selectedTime state if time is selected
+   * Output: Future<void> - Completes when time selection is finished
+   */
   Future<void> _selectTime() async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -278,6 +318,17 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
     }
   }
 
+  /**
+   * Build the report form screen UI
+   * 
+   * Input: BuildContext context
+   * Processing: 
+   * - Create scaffold with app bar and submit button
+   * - Build image upload section
+   * - Create comprehensive form with all fields
+   * - Add validation and user interactions
+   * Output: Widget - Complete report form screen interface
+   */
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -559,6 +610,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                         decoration: InputDecoration(
                           hintText:
                               'Enter hex code (e.g., #FF0000) or color name...',
+                          helperText:
+                              'Allowed: #RRGGBB or names: red, blue, green, yellow, purple, orange, pink, brown, grey',
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16,
@@ -575,6 +628,28 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                             ),
                           ),
                         ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty)
+                            return null; // optional
+                          final v = value.trim();
+                          final hexRegex = RegExp(r'^#([A-Fa-f0-9]{6})$');
+                          const allowedNames = [
+                            'red',
+                            'blue',
+                            'green',
+                            'yellow',
+                            'purple',
+                            'orange',
+                            'pink',
+                            'brown',
+                            'grey',
+                            'gray',
+                          ];
+                          if (hexRegex.hasMatch(v)) return null;
+                          if (allowedNames.contains(v.toLowerCase()))
+                            return null;
+                          return 'Enter #RRGGBB or a supported name';
+                        },
                       ),
                     ),
 

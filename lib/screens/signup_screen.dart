@@ -6,9 +6,9 @@
  * Provides registration interface with password confirmation and form validation.
  * Includes navigation back to login screen for existing users.
  * 
- * Author: [Your Name]
- * Created: [Date]
- * Last Modified: [Date]
+ * Author: Siddak Bath
+ * Created: [17/07/2025]
+ * Last Modified: [05/08/2025]
  */
 
 import 'package:flutter/material.dart';
@@ -73,25 +73,17 @@ class _SignupScreenState extends State<SignupScreen> {
   /**
    * Handle user registration
    * 
-   * Validates the form inputs, checks password confirmation, and attempts
-   * to create a new user account with Firebase Auth. Handles loading states
-   * and error display.
-   * 
-   * Registration Flow:
-   * 1. Validate form inputs
-   * 2. Check password confirmation match
-   * 3. Set loading state to true
-   * 4. Clear any previous error messages
-   * 5. Attempt account creation with Firebase
-   * 6. Handle success (navigation handled by AuthWrapper)
-   * 7. Handle errors with user-friendly messages
-   * 8. Reset loading state
-   * 
-   * Validation Steps:
-   * - Email format validation
-   * - Password strength requirements
-   * - Password confirmation matching
-   * - Firebase-specific validation (email uniqueness, etc.)
+   * Input: None (uses form controllers)
+   * Processing: 
+   * - Validate form inputs
+   * - Check password confirmation match
+   * - Set loading state to true
+   * - Clear any previous error messages
+   * - Attempt account creation with Firebase
+   * - Handle success (navigation handled by AuthWrapper)
+   * - Handle errors with user-friendly messages
+   * - Reset loading state
+   * Output: void (none)
    */
   void signUp() async {
     // Validate form before attempting registration
@@ -135,6 +127,17 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  /**
+   * Build the signup screen UI
+   * 
+   * Input: BuildContext context
+   * Processing: 
+   * - Create scaffold with app bar
+   * - Build form with email, password, and confirm password fields
+   * - Add validation and error handling
+   * - Include loading states and navigation
+   * Output: Widget - Complete signup screen interface
+   */
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -203,19 +206,25 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       child: TextFormField(
                         controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
                         decoration: const InputDecoration(
                           hintText: 'example@example.com',
+                          helperText: 'Format: name@example.com',
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 12,
                           ),
                         ),
-                        validator:
-                            (v) =>
-                                v!.isEmpty
-                                    ? 'Enter email'
-                                    : null, // Form validation
+                        validator: (v) {
+                          if (v == null || v.isEmpty) return 'Enter email';
+                          final emailRegex = RegExp(
+                            r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                          );
+                          if (!emailRegex.hasMatch(v))
+                            return 'Enter a valid email address';
+                          return null;
+                        },
                         enabled: !isLoading, // Disable during registration
                       ),
                     ),

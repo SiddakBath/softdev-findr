@@ -6,9 +6,9 @@
  * Provides reusable success dialog with customizable text and styling.
  * Includes helper function for easy dialog display.
  * 
- * Author: [Your Name]
- * Created: [Date]
- * Last Modified: [Date]
+ * Author: Siddak Bath
+ * Created: [17/07/2025]
+ * Last Modified: [05/08/2025]
  */
 
 import 'package:flutter/material.dart';
@@ -36,11 +36,9 @@ class SuccessDialog extends StatelessWidget {
   /**
    * Constructor for SuccessDialog widget
    * 
-   * Parameters:
-   * - key: Key? - Widget key for identification
-   * - title: String - Dialog title (default: 'Success!')
-   * - message: String - Dialog message (default: 'Action completed successfully.')
-   * - onDismiss: VoidCallback? - Optional callback for dismiss action
+   * Input: Key? key, String title, message, VoidCallback? onDismiss
+   * Processing: Initialize SuccessDialog with dialog content and dismiss callback
+   * Output: SuccessDialog instance
    */
   const SuccessDialog({
     Key? key,
@@ -49,6 +47,17 @@ class SuccessDialog extends StatelessWidget {
     this.onDismiss,
   }) : super(key: key);
 
+  /**
+   * Build the success dialog UI
+   * 
+   * Input: BuildContext context
+   * Processing: 
+   * - Create modal dialog with custom styling
+   * - Display title and message
+   * - Add OK button for dismissal
+   * - Handle button interaction with callback
+   * Output: Widget - Complete success dialog interface
+   */
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -119,29 +128,12 @@ class SuccessDialog extends StatelessWidget {
 /**
  * Helper function to show success dialog
  * 
- * Convenience function that creates and displays a success dialog
- * with the specified parameters. The dialog is non-dismissible to
- * ensure users acknowledge the success message.
- * 
- * Parameters:
- * - context: BuildContext - The build context for showing the dialog
- * - title: String - Dialog title (default: 'Success!')
- * - message: String - Dialog message (default: 'Action completed successfully.')
- * - onDismiss: VoidCallback? - Optional callback for dismiss action
- * 
- * Returns: void - No return value, dialog is displayed modally
- * 
- * Usage Example:
- * ```dart
- * showSuccessDialog(
- *   context,
- *   title: 'Success!',
- *   message: 'Report created successfully!',
- *   onDismiss: () {
- *     // Handle dismiss callback
- *   },
- * );
- * ```
+ * Input: BuildContext context, String title, message, VoidCallback? onDismiss
+ * Processing: 
+ * - Create and display success dialog
+ * - Handle dialog dismissal
+ * - Execute optional dismiss callback
+ * Output: void - No return value, dialog is displayed modally
  */
 void showSuccessDialog(
   BuildContext context, {

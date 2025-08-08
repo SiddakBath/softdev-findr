@@ -6,9 +6,9 @@
  * Displays grid of lost and found reports with filtering and search capabilities.
  * Provides report management actions and navigation to other screens.
  * 
- * Author: [Your Name]
- * Created: [Date]
- * Last Modified: [Date]
+ * Author: Siddak Bath
+ * Created: [17/07/2025]
+ * Last Modified: [05/08/2025]
  */
 
 import 'package:flutter/material.dart';
@@ -62,6 +62,17 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController =
       TextEditingController(); // Search input controller
 
+  /**
+   * Build the home screen UI
+   * 
+   * Input: BuildContext context
+   * Processing: 
+   * - Create scaffold with app bar and logout button
+   * - Build search and filter section
+   * - Display reports grid with real-time data
+   * - Handle user interactions and navigation
+   * Output: Widget - Complete home screen interface
+   */
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -286,18 +297,12 @@ class _HomeScreenState extends State<HomeScreen> {
   /**
    * Build toggle option for lost/found filter
    * 
-   * Creates a selectable button for filtering reports by type.
-   * Handles visual feedback for selected state and user interaction.
-   * 
-   * Parameters:
-   * - value: String - The filter value ('lost' or 'found')
-   * - label: String - Display text for the toggle option
-   * 
-   * Returns: Widget - A clickable toggle button
-   * 
-   * Visual States:
-   * - Selected: Purple background with white text
-   * - Unselected: Transparent background with grey text
+   * Input: String value, String label
+   * Processing: 
+   * - Create selectable button for filtering reports by type
+   * - Handle visual feedback for selected state
+   * - Update state on user interaction
+   * Output: Widget - A clickable toggle button
    */
   Widget _buildToggleOption(String value, String label) {
     final isSelected = selectedType == value;

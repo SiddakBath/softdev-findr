@@ -198,7 +198,7 @@ For technical support or feature requests, please contact the development team o
 
 ---
 
-**Author**: [Your Name]  
+**Author**: Siddak Bath  
 **Created**: [Date]  
 **Last Modified**: [Date]  
 **Version**: 1.0.0

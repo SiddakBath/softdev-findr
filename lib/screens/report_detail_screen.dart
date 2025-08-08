@@ -6,9 +6,9 @@
  * Displays complete report information in organized sections.
  * Provides owner-specific actions for editing and deleting reports.
  * 
- * Author: [Your Name]
- * Created: [Date]
- * Last Modified: [Date]
+ * Author: Siddak Bath
+ * Created: [17/07/2025]
+ * Last Modified: [05/08/2025]
  */
 
 import 'package:findr/models/report.dart';
@@ -49,16 +49,26 @@ class ReportDetailScreen extends StatelessWidget {
   /**
    * Check if current user is the owner of this report
    * 
-   * Compares the current user's email with the report's reporter email
-   * to determine ownership for action permissions.
-   * 
-   * Returns: bool - True if current user is the report owner
+   * Input: None (uses Firebase Auth and report data)
+   * Processing: Compare current user's email with report's reporter email
+   * Output: bool - True if current user is the report owner
    */
   bool get isOwner {
     final currentUser = FirebaseAuth.instance.currentUser;
     return currentUser?.email == report.reporterEmail;
   }
 
+  /**
+   * Build the report detail screen UI
+   * 
+   * Input: BuildContext context
+   * Processing: 
+   * - Create scaffold with app bar and owner actions
+   * - Build scrollable content with organized sections
+   * - Display report information in structured layout
+   * - Handle user interactions and navigation
+   * Output: Widget - Complete report detail screen interface
+   */
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,6 +152,16 @@ class ReportDetailScreen extends StatelessWidget {
     );
   }
 
+  /**
+   * Build item image section
+   * 
+   * Input: None (uses report data)
+   * Processing: 
+   * - Display report image if available
+   * - Show placeholder if no image
+   * - Handle image loading errors
+   * Output: Widget - Image section with background color
+   */
   Widget _buildItemImage() {
     return Center(
       child: Container(
@@ -172,6 +192,16 @@ class ReportDetailScreen extends StatelessWidget {
     );
   }
 
+  /**
+   * Build action button (contact or resolve)
+   * 
+   * Input: None (uses report data and owner status)
+   * Processing: 
+   * - Show resolve button for owner
+   * - Show contact button for non-owner
+   * - Handle button interactions with confirmation dialogs
+   * Output: Widget - Action button with appropriate text and behavior
+   */
   Widget _buildActionButton() {
     return Builder(
       builder:
@@ -241,6 +271,13 @@ class ReportDetailScreen extends StatelessWidget {
     );
   }
 
+  /**
+   * Build description section
+   * 
+   * Input: None (uses report data)
+   * Processing: Create styled container with report description
+   * Output: Widget - Description section with formatted text
+   */
   Widget _buildDescriptionSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,6 +312,15 @@ class ReportDetailScreen extends StatelessWidget {
     );
   }
 
+  /**
+   * Build date and time section
+   * 
+   * Input: None (uses report data)
+   * Processing: 
+   * - Format date and time using DateFormat
+   * - Create row with two columns for date and time
+   * Output: Widget - Date and time section with formatted display
+   */
   Widget _buildDateTimeSection() {
     final dateFormat = DateFormat('dd/MM/yyyy');
     final timeFormat = DateFormat('HH:mm');
@@ -350,6 +396,15 @@ class ReportDetailScreen extends StatelessWidget {
     );
   }
 
+  /**
+   * Build tags section
+   * 
+   * Input: None (uses report data)
+   * Processing: 
+   * - Create wrap layout for tags
+   * - Style each tag with background color and border radius
+   * Output: Widget - Tags section with styled tag chips
+   */
   Widget _buildTagsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,6 +449,16 @@ class ReportDetailScreen extends StatelessWidget {
     );
   }
 
+  /**
+   * Build color section
+   * 
+   * Input: None (uses report data)
+   * Processing: 
+   * - Parse color text to Color object
+   * - Create visual color representation
+   * - Display color name and visual indicator
+   * Output: Widget - Color section with visual color display
+   */
   Widget _buildColorSection() {
     // Convert hex string to Color object
     Color colorFromHex(String hexString) {
@@ -457,6 +522,13 @@ class ReportDetailScreen extends StatelessWidget {
     );
   }
 
+  /**
+   * Build location section
+   * 
+   * Input: None (uses report data)
+   * Processing: Create styled container with location information
+   * Output: Widget - Location section with formatted text
+   */
   Widget _buildLocationSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -482,7 +554,7 @@ class ReportDetailScreen extends StatelessWidget {
             report.location,
             style: const TextStyle(
               fontSize: 14,
-              color: Colors.black87,
+              color: Colors.black,
               height: 1.4,
             ),
           ),
