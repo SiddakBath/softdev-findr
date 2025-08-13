@@ -205,6 +205,20 @@
         <td>None required</td>
       </tr>
       <tr>
+        <td>Output for "Latest" sort option</td>
+        <td><code>selectedSort = "latest"</code>; dataset with varying <code>createdAt</code></td>
+        <td>Cards ordered by <code>createdAt</code> descending (newest first).</td>
+        <td>As expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for "Oldest" sort option</td>
+        <td><code>selectedSort = "oldest"</code>; dataset with varying <code>createdAt</code></td>
+        <td>Cards ordered by <code>createdAt</code> ascending (oldest first).</td>
+        <td>As expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
         <td>Output for real-time stream update</td>
         <td>Add a new report in Firestore while Home is open</td>
         <td>New card appears without manual refresh.</td>
@@ -382,6 +396,13 @@
         <td>None required</td>
       </tr>
       <tr>
+        <td>Rendering check of "Colour" from name (fallback)</td>
+        <td><code>colour = "green"</code></td>
+        <td>Neutral grey swatch shown; text "green" displayed.</td>
+        <td>Grey swatch; "green" text shown.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
         <td>Formatting check of "Date" and "Time" values</td>
         <td><code>timeFoundLost = 2025-08-05T14:35:00</code></td>
         <td>Date: <code>dd/MM/yyyy</code>; Time: <code>HH:mm</code>.</td>
@@ -442,6 +463,13 @@
         <td>Visibility check of "Non-owner menu"</td>
         <td>Non-owner view</td>
         <td>No ⋮ menu displayed.</td>
+        <td>Hidden as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Visibility of "Resolve" menu when already resolved</td>
+        <td>Owner view; <code>report.resolved = true</code></td>
+        <td>"Resolve" option is not present in the ⋮ menu.</td>
         <td>Hidden as expected.</td>
         <td>None required</td>
       </tr>
