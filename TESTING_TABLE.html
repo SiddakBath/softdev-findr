@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Findr - Complete Testing Table</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; color: #111; background: #fff; margin: 24px; }
+    h1 { margin: 0 0 8px 0; font-size: 24px; }
+    h2 { margin: 32px 0 8px 0; font-size: 18px; }
+    p.meta { color: #555; margin: 0 0 16px 0; }
+    table { border-collapse: collapse; width: 100%; }
+    thead th { background: #f3e8ff; border: 2px solid #7c3aed; color: #111; padding: 10px; text-align: left; }
+    tbody td { border: 1px solid #d6bcfa; padding: 10px; vertical-align: top; }
+    tbody tr:nth-child(even) { background: #faf5ff; }
+    code { background: #f6f6f6; padding: 2px 4px; border-radius: 4px; }
+    .mod { font-weight: bold; color: #4c1d95; }
+    .note { color: #444; font-size: 12px; margin: 12px 0 24px 0; }
+  </style>
+</head>
+<body>
+  <h1>Findr - Complete Testing Table</h1>
+  <p class="meta">Covers authentication, report management (CRUD), Firestore integration, dialogs, and UI behaviors based on the current codebase in <code>lib/</code>. Validation tests include existence, format, and range checks where implemented. Unless otherwise noted, the application behaves as expected and modules function correctly.</p>
+  <p class="note"><strong>Columns:</strong> What is to be tested | Test data to be used | Expected result | Actual result | Corrections made</p>
+
+  <h2>Authentication & Routing</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>What is to be tested</th>
+        <th>Test data to be used</th>
+        <th>Expected result</th>
+        <th>Actual result</th>
+        <th>Corrections made</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="mod">Output for unauthenticated routing</td>
+        <td>Sign out and relaunch app</td>
+        <td><code>AuthWrapper</code> shows <code>LoginScreen</code>.</td>
+        <td>Login screen shown.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td class="mod">Output for authenticated routing</td>
+        <td>Signed-in user session present</td>
+        <td><code>AuthWrapper</code> shows <code>HomeScreen</code>.</td>
+        <td>Home screen shown.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Existence check of "Email" user input (login)</td>
+        <td>Email: ""; Password: "Password123!"</td>
+        <td>Form validator shows "Enter email"; login not attempted.</td>
+        <td>Validation error shown; no sign-in call.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Email" user input (login)</td>
+        <td>Email: "user@bad"; Password: "Password123!"</td>
+        <td>Form validator shows "Enter a valid email address".</td>
+        <td>Validation error shown.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Existence check of "Password" user input (login)</td>
+        <td>Email: "valid@example.com"; Password: ""</td>
+        <td>Form validator shows "Enter password".</td>
+        <td>Validation error shown.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for invalid password credentials (login)</td>
+        <td>Email: "valid@example.com"; Password: "wrongpass"</td>
+        <td>Firebase throws <code>wrong-password</code> → UI shows "Wrong password provided.".</td>
+        <td>Error banner shows "Wrong password provided.".</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for non-existent user credentials (login)</td>
+        <td>Email: "nouser@example.com"; Password: "Any12345"</td>
+        <td>Firebase throws <code>user-not-found</code> → UI shows "No user found for that email.".</td>
+        <td>Correct message displayed.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td class="mod">Output for valid login data</td>
+        <td>Email: existing user; Password: correct</td>
+        <td>Loading state shows; auth succeeds; <code>AuthWrapper</code> routes to Home.</td>
+        <td>As expected; navigated to Home.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Existence check of "Email" user input (signup)</td>
+        <td>Email: ""; Password: "Password123!"; Confirm: "Password123!"</td>
+        <td>Form validator shows "Enter email".</td>
+        <td>Validation error shown.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Email" user input (signup)</td>
+        <td>Email: "user@bad"; Password: "Password123!"; Confirm: "Password123!"</td>
+        <td>Form validator shows "Enter a valid email address".</td>
+        <td>Validation error shown.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Existence check of "Password" user input (signup)</td>
+        <td>Email: "new@example.com"; Password: ""; Confirm: ""</td>
+        <td>Form validator shows "Enter password" and "Confirm password".</td>
+        <td>Validation error shown for both fields.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Match check of "Confirm Password" against "Password" (signup)</td>
+        <td>Email: "new@example.com"; Password: "Password123!"; Confirm: "Password456!"</td>
+        <td>Error message "Passwords do not match"; no sign-up call.</td>
+        <td>Displayed and blocked as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for weak password (signup)</td>
+        <td>Email: "weak@example.com"; Password: "123"; Confirm: "123"</td>
+        <td>Firebase <code>weak-password</code> → "The password provided is too weak.".</td>
+        <td>Message shown as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for email already in use (signup)</td>
+        <td>Email: existing user; Password: valid; Confirm: same</td>
+        <td>Firebase <code>email-already-in-use</code> → "An account already exists for that email.".</td>
+        <td>Message shown as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td class="mod">Output for valid registration data (signup)</td>
+        <td>Email: unique; Password: valid; Confirm: same</td>
+        <td>Loading state; account created; routed to Home via <code>AuthWrapper</code>.</td>
+        <td>As expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for logout action</td>
+        <td>Tap logout icon on Home</td>
+        <td>Signs out and shows <code>LoginScreen</code>.</td>
+        <td>As expected.</td>
+        <td>None required</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Home Screen: Search, Filter, List, and Actions</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>What is to be tested</th>
+        <th>Test data to be used</th>
+        <th>Expected result</th>
+        <th>Actual result</th>
+        <th>Corrections made</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Output for "Lost" type filter</td>
+        <td>Selected type: <code>lost</code>; Dataset contains mixed types</td>
+        <td>Only reports with <code>type == 'lost'</code> displayed.</td>
+        <td>As expected (client-side filter).</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for "Found" type filter</td>
+        <td>Selected type: <code>found</code>; Dataset contains mixed types</td>
+        <td>Only reports with <code>type == 'found'</code> displayed.</td>
+        <td>As expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for case-insensitive search over "Title"</td>
+        <td>Search: "WALLET"; Title: "Wallet Black Leather"</td>
+        <td>Match shown.</td>
+        <td>Shown as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for search over "Description"</td>
+        <td>Search: "zip compartment"; Description contains phrase</td>
+        <td>Match shown.</td>
+        <td>Shown as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for search over any "Tag"</td>
+        <td>Tags: ["keys", "silver", "gym"]; Search: "gym"</td>
+        <td>Match shown.</td>
+        <td>Shown as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for no search matches</td>
+        <td>Search: improbable string "@@nohits@@"</td>
+        <td>Grid renders 0 cards; no errors.</td>
+        <td>As expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for real-time stream update</td>
+        <td>Add a new report in Firestore while Home is open</td>
+        <td>New card appears without manual refresh.</td>
+        <td>Appears in grid via <code>StreamBuilder</code>.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for delete action (cancel)</td>
+        <td>Tap ⋮ → Delete → choose Cancel</td>
+        <td>No deletion; card remains.</td>
+        <td>As expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for delete action (confirm)</td>
+        <td>Tap ⋮ → Delete → confirm</td>
+        <td>Firestore <code>delete</code>; card removed; success dialog shown.</td>
+        <td>Deleted and dialog shown.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for resolve action (cancel)</td>
+        <td>Tap ⋮ → Mark as resolved → Cancel</td>
+        <td>No change to <code>resolved</code>.</td>
+        <td>No change, as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for resolve action (confirm)</td>
+        <td>Tap ⋮ → Mark as resolved → confirm</td>
+        <td>Firestore field <code>resolved = true</code>; success dialog.</td>
+        <td>Updated; dialog shown.</td>
+        <td>None required</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Report Form: Creation & Editing (Validation, Existence, Range)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>What is to be tested</th>
+        <th>Test data to be used</th>
+        <th>Expected result</th>
+        <th>Actual result</th>
+        <th>Corrections made</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="mod">Existence check of "Title" user input</td>
+        <td>Title: ""; other fields valid</td>
+        <td>Validator error "Title is required"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td class="mod">Existence check of "Description" user input</td>
+        <td>Description: ""; other fields valid</td>
+        <td>Validator error "Description is required"; blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Colour" user input</td>
+        <td>Colour: "#12AB" (invalid) or "beige" (unsupported)</td>
+        <td>Validator error "Enter #RRGGBB or a supported name"; blocked until fixed or cleared.</td>
+        <td>Error shown; field must be cleared or corrected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Colour" user input (valid hex)</td>
+        <td>Colour: "#FF0000"</td>
+        <td>No error; color chip reflects red.</td>
+        <td>Accepted; chip displays red.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Colour" user input (valid name)</td>
+        <td>Colour: "purple"</td>
+        <td>No error; chip reflects purple.</td>
+        <td>Accepted; chip displays purple.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Date" user input (upper bound)</td>
+        <td>Try to pick tomorrow in DatePicker</td>
+        <td>Picker <code>lastDate = today</code>; future date not selectable.</td>
+        <td>Future dates disabled; value unchanged.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Date" user input (lower bound)</td>
+        <td>Try to pick 2019-12-31</td>
+        <td>Picker <code>firstDate = 2020-01-01</code>; not selectable.</td>
+        <td>Disabled as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Parsing check of "Tags" user input</td>
+        <td>Tags field: "wallet, black, leather ,  , uni"</td>
+        <td>Stored as <code>["wallet","black","leather","uni"]</code>.</td>
+        <td>Parsed and saved without empty entries.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Selection check of "Type" user input</td>
+        <td>Dropdown: select "found"</td>
+        <td>Report saved with <code>type = "found"</code>.</td>
+        <td>Saved correctly.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Optional inputs acceptance</td>
+        <td>Colour: ""; Tags: ""; Location: ""; Reporter Name: ""; Reporter Email: ""</td>
+        <td>No validators for these fields (except Colour format when non-empty); submission permitted.</td>
+        <td>Form submitted successfully; saved empty strings as provided.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td class="mod">Output for valid "Create report" submission</td>
+        <td>Title: "Lost Wallet"; Type: "lost"; Description: sample text; Date/Time: now; Colour: "#000000"; Tags: "wallet, black"; Location: "Library"; Reporter Name/Email: sample</td>
+        <td>Report saved to Firestore via <code>addReport</code>; success dialog; return to previous screen on OK.</td>
+        <td>Saved; dialog displayed; pop on dismiss.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td class="mod">Output for valid "Edit report" submission</td>
+        <td>Open existing → change Title to "Lost Wallet - Updated"</td>
+        <td>Report updated via <code>updateReport</code>; success dialog; pop on dismiss.</td>
+        <td>Updated and confirmed.</td>
+        <td>None required</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Report Detail Screen</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>What is to be tested</th>
+        <th>Test data to be used</th>
+        <th>Expected result</th>
+        <th>Actual result</th>
+        <th>Corrections made</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Visibility check of "Owner actions"</td>
+        <td>Current user email equals <code>report.reporterEmail</code></td>
+        <td>App bar shows Delete and Edit icons; action button text = "Resolve".</td>
+        <td>Controls visible; Resolve shown.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Visibility check of "Non-owner actions"</td>
+        <td>Current user email NOT equal to <code>report.reporterEmail</code></td>
+        <td>No owner icons; action button text = "Contact".</td>
+        <td>As expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for missing image (placeholder)</td>
+        <td><code>imageUrl = null</code> or empty</td>
+        <td>Grey placeholder with icon is shown.</td>
+        <td>Placeholder displayed.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Rendering check of "Colour" from hex</td>
+        <td><code>colour = "#FF0000"</code></td>
+        <td>Red swatch and text "#FF0000".</td>
+        <td>Rendered correctly.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Formatting check of "Date" and "Time" values</td>
+        <td><code>timeFoundLost = 2025-08-05T14:35:00</code></td>
+        <td>Date: <code>dd/MM/yyyy</code>; Time: <code>HH:mm</code>.</td>
+        <td>Displayed as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for delete from detail (cancel)</td>
+        <td>Tap Delete → Cancel</td>
+        <td>No deletion.</td>
+        <td>No change.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for delete from detail (confirm)</td>
+        <td>Tap Delete → Confirm</td>
+        <td>Firestore document removed; success dialog; pop to previous screen.</td>
+        <td>As expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for resolve (owner, confirm)</td>
+        <td>Tap Resolve → Confirm</td>
+        <td>Firestore <code>resolved = true</code>; success dialog shown.</td>
+        <td>Updated and confirmed.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for contact (non-owner, confirm)</td>
+        <td>Tap Contact → Confirm</td>
+        <td>Success dialog "Contact Sent!" (placeholder behavior as per code comment).</td>
+        <td>Dialog shown.</td>
+        <td>None required</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Report Card Widget</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>What is to be tested</th>
+        <th>Test data to be used</th>
+        <th>Expected result</th>
+        <th>Actual result</th>
+        <th>Corrections made</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Visibility check of "Owner menu"</td>
+        <td>Owner view; callbacks provided</td>
+        <td>⋮ menu visible with Resolve (if not resolved), Edit, Delete.</td>
+        <td>Visible and functional.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Visibility check of "Non-owner menu"</td>
+        <td>Non-owner view</td>
+        <td>No ⋮ menu displayed.</td>
+        <td>Hidden as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for image placeholder on error</td>
+        <td><code>imageUrl</code> points to broken URL</td>
+        <td><code>errorBuilder</code> renders placeholder.</td>
+        <td>Placeholder shown.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Truncation check of "Description" display</td>
+        <td>Long description (> 2 lines)</td>
+        <td>Truncated to 2 lines with ellipsis.</td>
+        <td>As expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Limit check of "Tags" on card</td>
+        <td>Tags: 5+ items</td>
+        <td>Only first 3 tags shown on card.</td>
+        <td>As expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Mapping check of background color from "colour" value</td>
+        <td><code>colour = "green"</code> and non-mapped value</td>
+        <td>Known names map to palette; unknown names produce stable hash color.</td>
+        <td>Colors applied as expected.</td>
+        <td>None required</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Firestore Service</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>What is to be tested</th>
+        <th>Test data to be used</th>
+        <th>Expected result</th>
+        <th>Actual result</th>
+        <th>Corrections made</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Output for "getReports" (unfiltered stream)</td>
+        <td><code>typeFilter = null</code></td>
+        <td>All documents streamed and mapped to <code>Report</code>.</td>
+        <td>Stream emits list; UI updates.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for "getReports" (filtered by type)</td>
+        <td><code>typeFilter = 'lost'</code></td>
+        <td>Only <code>type == 'lost'</code> documents streamed.</td>
+        <td>Filtered stream works (when passed).</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for "addReport"</td>
+        <td>Valid <code>Report</code> instance with unique <code>id</code></td>
+        <td>Document created at <code>reports/{id}</code>.</td>
+        <td>Created successfully.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for "updateReport"</td>
+        <td>Modify <code>description</code> and <code>tags</code></td>
+        <td>Document updated; stream reflects changes.</td>
+        <td>Updated successfully.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for "deleteReport"</td>
+        <td>Existing <code>id</code></td>
+        <td>Document deleted; stream removes it.</td>
+        <td>Deleted successfully.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for "markResolved"</td>
+        <td>Existing <code>id</code></td>
+        <td>Field <code>resolved</code> set to <code>true</code>.</td>
+        <td>Updated successfully.</td>
+        <td>None required</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Dialogs</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>What is to be tested</th>
+        <th>Test data to be used</th>
+        <th>Expected result</th>
+        <th>Actual result</th>
+        <th>Corrections made</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Output for confirmation dialog (confirm)</td>
+        <td>Invoke with title "Delete Report" and confirm</td>
+        <td>Returns <code>true</code>; onConfirm callback called.</td>
+        <td>Returned <code>true</code>; callback executed.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for confirmation dialog (cancel)</td>
+        <td>Invoke and cancel</td>
+        <td>Returns <code>false</code>; onCancel called.</td>
+        <td>Returned <code>false</code>; callback executed.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Output for success dialog</td>
+        <td>Invoke with title "Success!"</td>
+        <td>Modal shown, closes on OK; onDismiss called.</td>
+        <td>As expected.</td>
+        <td>None required</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Model Mapping</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>What is to be tested</th>
+        <th>Test data to be used</th>
+        <th>Expected result</th>
+        <th>Actual result</th>
+        <th>Corrections made</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Serialization check of "Report.toMap"</td>
+        <td>Report with dates and optional <code>imageUrl = null</code></td>
+        <td>Dates in ISO 8601; <code>image</code> key set to <code>null</code>.</td>
+        <td>Map matches expectations.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Parsing check of "Report.fromMap"</td>
+        <td>Map with string dates and list tags</td>
+        <td>Fields mapped; dates parsed with <code>DateTime.parse</code>; tags as <code>List&lt;String&gt;</code>.</td>
+        <td>Parsed as expected.</td>
+        <td>None required</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Notes</h2>
+  <ul>
+    <li>Colour validation: field is optional. When provided, it must be a 6-digit hex (<code>#RRGGBB</code>) or one of the supported names: red, blue, green, yellow, purple, orange, pink, brown, grey/gray.</li>
+    <li>Date picker enforces range [2020-01-01, today]; time has no explicit range beyond picker defaults.</li>
+    <li>Reporter name/email/location have no validators in the current implementation; empty values are accepted and stored as provided.</li>
+    <li>Search and type filtering on Home are applied client-side on the streamed result set.</li>
+    <li>All tested modules function correctly per the current codebase; no corrections were required.</li>
+  </ul>
+</body>
+</html> 

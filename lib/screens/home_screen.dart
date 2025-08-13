@@ -43,13 +43,15 @@ class HomeScreen extends StatefulWidget {
  * Manages the UI state including:
  * - Current filter selection (lost/found)
  * - Search text input
+ * - Sort selection (latest/oldest)
  * - Service instances for data operations
  * 
  * Data Flow:
  * 1. StreamBuilder listens to Firestore reports stream
  * 2. Reports are filtered by type and search query
- * 3. Filtered reports displayed in grid layout
- * 4. User interactions trigger appropriate service calls
+ * 3. Reports are sorted by selected criteria
+ * 4. Filtered and sorted reports displayed in grid layout
+ * 5. User interactions trigger appropriate service calls
  */
 class _HomeScreenState extends State<HomeScreen> {
   // Service instances for data operations
@@ -59,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // UI state variables
   String? filter; // Current filter for Firestore query
   String selectedType = 'lost'; // Current type filter ('lost' or 'found')
+  String selectedSort = 'latest'; // Current sort option ('latest' or 'oldest')
   final TextEditingController _searchController =
       TextEditingController(); // Search input controller
 
@@ -122,25 +125,71 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Search Bar
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.purple[200]!),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: const InputDecoration(
-                      hintText: 'Search',
-                      hintStyle: TextStyle(color: Colors.grey),
-                      prefixIcon: Icon(Icons.search, color: Colors.grey),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+                // Search Bar and Sort Dropdown Row
+                Row(
+                  children: [
+                    // Search Bar
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.purple[200]!),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: const InputDecoration(
+                            hintText: 'Search',
+                            hintStyle: TextStyle(color: Colors.grey),
+                            prefixIcon: Icon(Icons.search, color: Colors.grey),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 12),
+                    // Sort Dropdown Button
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.purple[200]!),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: PopupMenuButton<String>(
+                        icon: const Icon(Icons.sort, color: Colors.grey),
+                        onSelected: (String value) {
+                          setState(() {
+                            selectedSort = value;
+                          });
+                        },
+                        itemBuilder:
+                            (BuildContext context) => [
+                              const PopupMenuItem<String>(
+                                value: 'latest',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.arrow_downward, size: 16),
+                                    SizedBox(width: 8),
+                                    Text('Latest'),
+                                  ],
+                                ),
+                              ),
+                              const PopupMenuItem<String>(
+                                value: 'oldest',
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.arrow_upward, size: 16),
+                                    SizedBox(width: 8),
+                                    Text('Oldest'),
+                                  ],
+                                ),
+                              ),
+                            ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -178,6 +227,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       return true;
                     }).toList();
 
+                // Apply sorting based on selected sort option
+                final sortedReports = List<Report>.from(filteredReports);
+                sortedReports.sort((a, b) {
+                  if (selectedSort == 'latest') {
+                    // Sort by createdAt descending (latest first)
+                    return b.createdAt.compareTo(a.createdAt);
+                  } else {
+                    // Sort by createdAt ascending (oldest first)
+                    return a.createdAt.compareTo(b.createdAt);
+                  }
+                });
+
                 // Display reports in a responsive grid layout
                 return GridView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -187,10 +248,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisSpacing: 16,
                     childAspectRatio: 0.8, // Card aspect ratio
                   ),
-                  itemCount: filteredReports.length,
+                  itemCount: sortedReports.length,
                   itemBuilder: (context, index) {
                     return ReportCard(
-                      report: filteredReports[index],
+                      report: sortedReports[index],
                       // Navigate to report detail screen on tap
                       onTap:
                           () => Navigator.push(
@@ -198,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             MaterialPageRoute(
                               builder:
                                   (_) => ReportDetailScreen(
-                                    report: filteredReports[index],
+                                    report: sortedReports[index],
                                   ),
                             ),
                           ),
@@ -209,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             MaterialPageRoute(
                               builder:
                                   (_) => ReportFormScreen(
-                                    report: filteredReports[index],
+                                    report: sortedReports[index],
                                   ),
                             ),
                           ),
@@ -226,9 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         if (shouldDelete == true) {
                           // Delete report from database
-                          await firestore.deleteReport(
-                            filteredReports[index].id,
-                          );
+                          await firestore.deleteReport(sortedReports[index].id);
                           // Show success message
                           showSuccessDialog(
                             context,
@@ -251,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (shouldResolve == true) {
                           // Mark report as resolved in database
                           await firestore.markResolved(
-                            filteredReports[index].id,
+                            sortedReports[index].id,
                           );
                           // Show success message
                           showSuccessDialog(
