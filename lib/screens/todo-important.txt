@@ -12,3 +12,4 @@ ADD SELECTION SORT STUFF - need search and sort
 EDITS MADE (FOR DOCUMENTATION)
 - "Show Contact" instead of "Contact" for clarity
 - Improved colour textbox and widget for visual appearance
+- Added strong password validation

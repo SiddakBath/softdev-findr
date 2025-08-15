@@ -217,6 +217,15 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   void submit() {
     if (!formKey.currentState!.validate()) return;
 
+    // Check date/time validation
+    final dateTimeError = _validateDateTime();
+    if (dateTimeError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(dateTimeError), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
     final tags =
         tagsController.text
             .split(',')
@@ -295,6 +304,31 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         selectedDate = picked;
       });
     }
+  }
+
+  /**
+   * Validate date and time selection
+   * 
+   * Input: None (uses selectedDate and selectedTime)
+   * Processing: 
+   * - Check if selected date/time is not in the future
+   * - Return validation error message if invalid
+   * Output: String? - Error message or null if valid
+   */
+  String? _validateDateTime() {
+    final selectedDateTime = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      selectedTime.hour,
+      selectedTime.minute,
+    );
+
+    if (selectedDateTime.isAfter(DateTime.now())) {
+      return 'Date and time cannot be in the future';
+    }
+
+    return null;
   }
 
   /**
@@ -434,6 +468,12 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Title is required';
                           }
+                          if (value.trim().length < 3) {
+                            return 'Title must be at least 3 characters long';
+                          }
+                          if (value.trim().length > 100) {
+                            return 'Title must be less than 100 characters';
+                          }
                           return null;
                         },
                       ),
@@ -470,6 +510,12 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Description is required';
+                          }
+                          if (value.trim().length < 10) {
+                            return 'Description must be at least 10 characters long';
+                          }
+                          if (value.trim().length > 500) {
+                            return 'Description must be less than 500 characters';
                           }
                           return null;
                         },
@@ -526,6 +572,17 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                                   ),
                                 ),
                               ),
+                              if (_validateDateTime() != null)
+                                Padding(
+                                  padding: EdgeInsets.only(top: 8),
+                                  child: Text(
+                                    _validateDateTime()!,
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -629,8 +686,9 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                           ),
                         ),
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty)
-                            return null; // optional
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Color is required';
+                          }
                           final v = value.trim();
                           final hexRegex = RegExp(r'^#([A-Fa-f0-9]{6})$');
                           const allowedNames = [
@@ -680,6 +738,35 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                             vertical: 12,
                           ),
                         ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'At least one tag is required';
+                          }
+                          final tags =
+                              value
+                                  .split(',')
+                                  .map((tag) => tag.trim())
+                                  .where((tag) => tag.isNotEmpty)
+                                  .toList();
+                          if (tags.isEmpty) {
+                            return 'At least one tag is required';
+                          }
+                          if (tags.length > 10) {
+                            return 'Maximum 10 tags allowed';
+                          }
+                          for (String tag in tags) {
+                            if (tag.length < 2) {
+                              return 'Each tag must be at least 2 characters long';
+                            }
+                            if (tag.length > 20) {
+                              return 'Each tag must be less than 20 characters';
+                            }
+                            if (!RegExp(r'^[a-zA-Z0-9\s]+$').hasMatch(tag)) {
+                              return 'Tags can only contain letters, numbers, and spaces';
+                            }
+                          }
+                          return null;
+                        },
                       ),
                     ),
 
@@ -757,6 +844,111 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                             vertical: 12,
                           ),
                         ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Location is required';
+                          }
+                          if (value.trim().length < 3) {
+                            return 'Location must be at least 3 characters long';
+                          }
+                          if (value.trim().length > 100) {
+                            return 'Location must be less than 100 characters';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+
+                    SizedBox(height: 20),
+
+                    // Reporter Name Field
+                    Text(
+                      'Reporter Name',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.purple[200]!),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextFormField(
+                        controller: reporterNameController,
+                        decoration: InputDecoration(
+                          hintText: 'Enter your full name...',
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Reporter name is required';
+                          }
+                          if (value.trim().length < 2) {
+                            return 'Name must be at least 2 characters long';
+                          }
+                          if (value.trim().length > 50) {
+                            return 'Name must be less than 50 characters';
+                          }
+                          if (!RegExp(
+                            r'^[a-zA-Z\s]+$',
+                          ).hasMatch(value.trim())) {
+                            return 'Name can only contain letters and spaces';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+
+                    SizedBox(height: 20),
+
+                    // Reporter Email Field
+                    Text(
+                      'Reporter Email',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.purple[200]!),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextFormField(
+                        controller: reporterEmailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          hintText: 'Enter your email address...',
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Email is required';
+                          }
+                          final emailRegex = RegExp(
+                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                          );
+                          if (!emailRegex.hasMatch(value.trim())) {
+                            return 'Please enter a valid email address';
+                          }
+                          if (value.trim().length > 100) {
+                            return 'Email must be less than 100 characters';
+                          }
+                          return null;
+                        },
                       ),
                     ),
                   ],

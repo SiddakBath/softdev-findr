@@ -270,6 +270,7 @@
       </tr>
     </thead>
     <tbody>
+      <!-- Title Field Validation -->
       <tr>
         <td class="mod">Existence check of "Title" user input</td>
         <td>Title: ""; other fields valid</td>
@@ -278,6 +279,29 @@
         <td>None required</td>
       </tr>
       <tr>
+        <td>Type/format check of "Title" user input</td>
+        <td>Title: "Valid Title"; other fields valid</td>
+        <td>No error; title accepted.</td>
+        <td>Accepted as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Title" user input (minimum length)</td>
+        <td>Title: "ab"; other fields valid</td>
+        <td>Validator error "Title must be at least 3 characters long"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Title" user input (maximum length)</td>
+        <td>Title: 101+ characters; other fields valid</td>
+        <td>Validator error "Title must be less than 100 characters"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+
+      <!-- Description Field Validation -->
+      <tr>
         <td class="mod">Existence check of "Description" user input</td>
         <td>Description: ""; other fields valid</td>
         <td>Validator error "Description is required"; blocked.</td>
@@ -285,7 +309,37 @@
         <td>None required</td>
       </tr>
       <tr>
-        <td>Type/format check of "Colour" user input</td>
+        <td>Type/format check of "Description" user input</td>
+        <td>Description: "Valid description with text"; other fields valid</td>
+        <td>No error; description accepted.</td>
+        <td>Accepted as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Description" user input (minimum length)</td>
+        <td>Description: "short"; other fields valid</td>
+        <td>Validator error "Description must be at least 10 characters long"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Description" user input (maximum length)</td>
+        <td>Description: 501+ characters; other fields valid</td>
+        <td>Validator error "Description must be less than 500 characters"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+
+      <!-- Colour Field Validation -->
+      <tr>
+        <td class="mod">Existence check of "Colour" user input</td>
+        <td>Colour: ""; other fields valid</td>
+        <td>Validator error "Color is required"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Colour" user input (invalid hex)</td>
         <td>Colour: "#12AB" (invalid) or "beige" (unsupported)</td>
         <td>Validator error "Enter #RRGGBB or a supported name"; blocked until fixed or cleared.</td>
         <td>Error shown; field must be cleared or corrected.</td>
@@ -305,11 +359,168 @@
         <td>Accepted; chip displays purple.</td>
         <td>None required</td>
       </tr>
+
+      <!-- Tags Field Validation -->
+      <tr>
+        <td class="mod">Existence check of "Tags" user input</td>
+        <td>Tags: ""; other fields valid</td>
+        <td>Validator error "At least one tag is required"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Tags" user input (valid format)</td>
+        <td>Tags: "wallet, black, leather"; other fields valid</td>
+        <td>No error; tags parsed correctly.</td>
+        <td>Accepted; parsed as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Tags" user input (invalid characters)</td>
+        <td>Tags: "tag@123"; other fields valid</td>
+        <td>Validator error "Tags can only contain letters, numbers, and spaces"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Tags" user input (minimum count)</td>
+        <td>Tags: "a"; other fields valid</td>
+        <td>Validator error "Each tag must be at least 2 characters long"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Tags" user input (maximum count)</td>
+        <td>Tags: "tag1,tag2,tag3,tag4,tag5,tag6,tag7,tag8,tag9,tag10,tag11"; other fields valid</td>
+        <td>Validator error "Maximum 10 tags allowed"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Tags" user input (individual tag length)</td>
+        <td>Tags: "verylongtagnameexceedingtwenty"; other fields valid</td>
+        <td>Validator error "Each tag must be less than 20 characters"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+
+      <!-- Location Field Validation -->
+      <tr>
+        <td class="mod">Existence check of "Location" user input</td>
+        <td>Location: ""; other fields valid</td>
+        <td>Validator error "Location is required"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Location" user input</td>
+        <td>Location: "Valid Location"; other fields valid</td>
+        <td>No error; location accepted.</td>
+        <td>Accepted as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Location" user input (minimum length)</td>
+        <td>Location: "ab"; other fields valid</td>
+        <td>Validator error "Location must be at least 3 characters long"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Location" user input (maximum length)</td>
+        <td>Location: 101+ characters; other fields valid</td>
+        <td>Validator error "Location must be less than 100 characters"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+
+      <!-- Reporter Name Field Validation -->
+      <tr>
+        <td class="mod">Existence check of "Reporter Name" user input</td>
+        <td>Reporter Name: ""; other fields valid</td>
+        <td>Validator error "Reporter name is required"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Reporter Name" user input (valid format)</td>
+        <td>Reporter Name: "John Smith"; other fields valid</td>
+        <td>No error; name accepted.</td>
+        <td>Accepted as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Reporter Name" user input (invalid characters)</td>
+        <td>Reporter Name: "John123"; other fields valid</td>
+        <td>Validator error "Name can only contain letters and spaces"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Reporter Name" user input (minimum length)</td>
+        <td>Reporter Name: "a"; other fields valid</td>
+        <td>Validator error "Name must be at least 2 characters long"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Reporter Name" user input (maximum length)</td>
+        <td>Reporter Name: 51+ characters; other fields valid</td>
+        <td>Validator error "Name must be less than 50 characters"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+
+      <!-- Reporter Email Field Validation -->
+      <tr>
+        <td class="mod">Existence check of "Reporter Email" user input</td>
+        <td>Reporter Email: ""; other fields valid</td>
+        <td>Validator error "Email is required"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Reporter Email" user input (valid format)</td>
+        <td>Reporter Email: "user@example.com"; other fields valid</td>
+        <td>No error; email accepted.</td>
+        <td>Accepted as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Reporter Email" user input (invalid format)</td>
+        <td>Reporter Email: "invalid-email"; other fields valid</td>
+        <td>Validator error "Please enter a valid email address"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Range check of "Reporter Email" user input (maximum length)</td>
+        <td>Reporter Email: 101+ characters; other fields valid</td>
+        <td>Validator error "Email must be less than 100 characters"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+
+      <!-- Date and Time Field Validation -->
+      <tr>
+        <td class="mod">Existence check of "Date and Time" user input</td>
+        <td>Date/Time: default values; other fields valid</td>
+        <td>No error; current date/time accepted.</td>
+        <td>Accepted as expected.</td>
+        <td>None required</td>
+      </tr>
+      <tr>
+        <td>Type/format check of "Date and Time" user input</td>
+        <td>Date/Time: valid date and time selection; other fields valid</td>
+        <td>No error; date/time accepted.</td>
+        <td>Accepted as expected.</td>
+        <td>None required</td>
+      </tr>
       <tr>
         <td>Range check of "Date" user input (upper bound)</td>
         <td>Try to pick tomorrow in DatePicker</td>
         <td>Picker <code>lastDate = today</code>; future date not selectable.</td>
-        <td>Future dates disabled; value unchanged.</td>
+        <td>Disabled as expected.</td>
         <td>None required</td>
       </tr>
       <tr>
@@ -320,24 +531,26 @@
         <td>None required</td>
       </tr>
       <tr>
-        <td>Parsing check of "Tags" user input</td>
-        <td>Tags field: "wallet, black, leather ,  , uni"</td>
-        <td>Stored as <code>["wallet","black","leather","uni"]</code>.</td>
-        <td>Parsed and saved without empty entries.</td>
+        <td>Range check of "Date and Time" (future date/time)</td>
+        <td>Set date to today and time to future time</td>
+        <td>Error message "Date and time cannot be in the future"; submission blocked.</td>
+        <td>Error shown; not submitted.</td>
+        <td>None required</td>
+      </tr>
+
+      <!-- Type Field Validation -->
+      <tr>
+        <td class="mod">Existence check of "Type" user input</td>
+        <td>Type: default "lost"; other fields valid</td>
+        <td>No error; default type accepted.</td>
+        <td>Accepted as expected.</td>
         <td>None required</td>
       </tr>
       <tr>
-        <td>Selection check of "Type" user input</td>
-        <td>Dropdown: select "found"</td>
-        <td>Report saved with <code>type = "found"</code>.</td>
-        <td>Saved correctly.</td>
-        <td>None required</td>
-      </tr>
-      <tr>
-        <td>Optional inputs acceptance</td>
-        <td>Colour: ""; Tags: ""; Location: ""; Reporter Name: ""; Reporter Email: ""</td>
-        <td>No validators for these fields (except Colour format when non-empty); submission permitted.</td>
-        <td>Form submitted successfully; saved empty strings as provided.</td>
+        <td>Type/format check of "Type" user input</td>
+        <td>Type: select "found" from dropdown; other fields valid</td>
+        <td>No error; type changed to "found".</td>
+        <td>Changed as expected.</td>
         <td>None required</td>
       </tr>
       <tr>
@@ -379,9 +592,9 @@
       <tr>
         <td>Visibility check of "Non-owner actions"</td>
         <td>Current user email NOT equal to <code>report.reporterEmail</code></td>
-        <td>No owner icons; action button text = "Contact".</td>
+        <td>No owner icons; action button text = "Show Contact".</td>
         <td>As expected.</td>
-        <td>None required</td>
+        <td>Updated button text from "Contact" to "Show Contact"</td>
       </tr>
       <tr>
         <td>Output for missing image (placeholder)</td>
@@ -434,10 +647,10 @@
       </tr>
       <tr>
         <td>Output for contact (non-owner, confirm)</td>
-        <td>Tap Contact → Confirm</td>
-        <td>Success dialog "Contact Sent!" (placeholder behavior as per code comment).</td>
-        <td>Dialog shown.</td>
-        <td>None required</td>
+        <td>Tap "Show Contact" button</td>
+        <td>Dialog shows "Contact Information" with reporter's email address displayed in a styled container.</td>
+        <td>Email displayed in dialog as expected.</td>
+        <td>Updated to show email instead of sending contact request</td>
       </tr>
     </tbody>
   </table>
@@ -630,9 +843,15 @@
 
   <h2>Notes</h2>
   <ul>
-    <li>Colour validation: field is optional. When provided, it must be a 6-digit hex (<code>#RRGGBB</code>) or one of the supported names: red, blue, green, yellow, purple, orange, pink, brown, grey/gray.</li>
-    <li>Date picker enforces range [2020-01-01, today]; time has no explicit range beyond picker defaults.</li>
-    <li>Reporter name/email/location have no validators in the current implementation; empty values are accepted and stored as provided.</li>
+    <li><strong>Required Fields:</strong> All fields are now required except for the image field. This includes: Title, Description, Colour, Tags, Location, Reporter Name, and Reporter Email.</li>
+    <li>Colour validation: field is required and must be a 6-digit hex (<code>#RRGGBB</code>) or one of the supported names: red, blue, green, yellow, purple, orange, pink, brown, grey/gray.</li>
+    <li>Title validation: 3-100 characters required.</li>
+    <li>Description validation: 10-500 characters required.</li>
+    <li>Tags validation: At least one tag required, maximum 10 tags, each 2-20 characters, only letters/numbers/spaces allowed.</li>
+    <li>Location validation: 3-100 characters required.</li>
+    <li>Reporter Name validation: 2-50 characters required, only letters and spaces allowed.</li>
+    <li>Reporter Email validation: Valid email format required, maximum 100 characters.</li>
+    <li>Date picker enforces range [2020-01-01, today]; time validation prevents future date/time combinations.</li>
     <li>Search and type filtering on Home are applied client-side on the streamed result set.</li>
     <li>All tested modules function correctly per the current codebase; no corrections were required.</li>
   </ul>
