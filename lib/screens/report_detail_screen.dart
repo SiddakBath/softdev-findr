@@ -229,25 +229,71 @@ class ReportDetailScreen extends StatelessWidget {
                     );
                   }
                 } else {
-                  // Contact action for non-owner
-                  final shouldContact = await showConfirmationDialog(
-                    context,
-                    title: 'Send Contact Request',
-                    message:
-                        'Are you sure you want to send a contact request to the reporter?',
-                    confirmText: 'Send',
-                    cancelText: 'Cancel',
+                  // Show reporter's email for non-owner
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text(
+                          'Contact Information',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Reporter\'s Email:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.grey[200]!),
+                              ),
+                              child: Text(
+                                report.reporterEmail,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'You can contact the reporter directly using this email address.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text(
+                              'Close',
+                              style: TextStyle(
+                                color: Colors.purple[600],
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   );
-
-                  if (shouldContact == true) {
-                    // You can implement contact functionality here
-                    showSuccessDialog(
-                      context,
-                      title: 'Contact Sent!',
-                      message:
-                          'Your contact request has been sent to the reporter.',
-                    );
-                  }
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -259,7 +305,7 @@ class ReportDetailScreen extends StatelessWidget {
                 elevation: 0,
               ),
               child: Text(
-                isOwner ? 'Resolve' : 'Contact',
+                isOwner ? 'Resolve' : 'Show Contact',
                 style: const TextStyle(
                   fontSize: 16,
                   color: Colors.white,

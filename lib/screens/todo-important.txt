@@ -5,3 +5,10 @@ THE TEACHER SAID THAT IT'S IMPORTANT THAT CONVENTIONS ARE FOLLOWED AND BUTTONS L
 YOU NEED TO WRITE OUTPUT: VOID if there's no output the teacher said
 
 ADD SELECTION SORT STUFF - need search and sort
+
+
+
+
+EDITS MADE (FOR DOCUMENTATION)
+- "Show Contact" instead of "Contact" for clarity
+- Improved colour textbox and widget for visual appearance
