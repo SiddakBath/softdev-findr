@@ -14,6 +14,7 @@
 import 'package:flutter/material.dart';
 import '../models/report.dart';
 import '../services/firestore_service.dart';
+import '../services/storage_service.dart';
 import '../widgets/success_dialog.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
@@ -85,9 +86,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   String type = 'lost'; // Default to lost items
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
-  Color selectedColor = Colors.grey;
+  Color selectedColor = const Color(0xFF808080); // Default grey hex color
   File? selectedImage;
   final ImagePicker _picker = ImagePicker();
+  final StorageService _storageService = StorageService();
 
   /**
    * Initialize form with existing report data if editing
@@ -118,6 +120,10 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
       selectedDate = r.timeFoundLost;
       selectedTime = TimeOfDay.fromDateTime(r.timeFoundLost);
       _updateSelectedColor(r.colour);
+    } else {
+      // Set default hex color for new reports
+      colourController.text = '#808080';
+      selectedColor = const Color(0xFF808080);
     }
   }
 
@@ -142,11 +148,24 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   }
 
   /**
-   * Update selected color based on color text input
+   * Remove selected image
+   * 
+   * Input: None
+   * Processing: Clear selectedImage state
+   * Output: void (none)
+   */
+  void _removeImage() {
+    setState(() {
+      selectedImage = null;
+    });
+  }
+
+  /**
+   * Update selected color based on hex color input
    * 
    * Input: String colorText
    * Processing: 
-   * - Parse color text (hex code or color name)
+   * - Parse hex color code (6-digit format)
    * - Convert to Flutter Color object
    * - Update selectedColor state for visual feedback
    * Output: void (none)
@@ -154,46 +173,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   void _updateSelectedColor(String colorText) {
     if (colorText.isNotEmpty) {
       try {
-        // Try to parse as hex color
+        // Parse as hex color (6-digit format)
         if (colorText.startsWith('#')) {
-          selectedColor = Color(
-            int.parse(colorText.substring(1), radix: 16) +
-                0xFF000000, // Add alpha channel
-          );
-        } else {
-          // Try to parse as color name
-          switch (colorText.toLowerCase()) {
-            case 'red':
-              selectedColor = Colors.red;
-              break;
-            case 'blue':
-              selectedColor = Colors.blue;
-              break;
-            case 'green':
-              selectedColor = Colors.green;
-              break;
-            case 'yellow':
-              selectedColor = Colors.yellow;
-              break;
-            case 'purple':
-              selectedColor = Colors.purple;
-              break;
-            case 'orange':
-              selectedColor = Colors.orange;
-              break;
-            case 'pink':
-              selectedColor = Colors.pink;
-              break;
-            case 'brown':
-              selectedColor = Colors.brown;
-              break;
-            case 'grey':
-            case 'gray':
-              selectedColor = Colors.grey;
-              break;
-            default:
-              // Keep current color if parsing fails
-              break;
+          final hexCode = colorText.substring(1);
+          if (hexCode.length == 6) {
+            selectedColor = Color(
+              int.parse(hexCode, radix: 16) + 0xFF000000, // Add alpha channel
+            );
           }
         }
       } catch (e) {
@@ -209,12 +195,13 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
    * Processing: 
    * - Validate form inputs
    * - Parse tags from comma-separated string
+   * - Upload image if selected
    * - Create Report object with form data
    * - Submit to Firestore service
    * - Handle success/error responses
    * Output: void (none)
    */
-  void submit() {
+  void submit() async {
     if (!formKey.currentState!.validate()) return;
 
     // Check date/time validation
@@ -226,61 +213,120 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
       return;
     }
 
-    final tags =
-        tagsController.text
-            .split(',')
-            .map((tag) => tag.trim())
-            .where((tag) => tag.isNotEmpty)
-            .toList();
-
-    final report = Report(
-      id: widget.report?.id ?? Uuid().v4(),
-      title: titleController.text,
-      type: type,
-      description: descController.text,
-      tags: tags,
-      colour: colourController.text,
-      timeFoundLost: DateTime(
-        selectedDate.year,
-        selectedDate.month,
-        selectedDate.day,
-        selectedTime.hour,
-        selectedTime.minute,
-      ),
-      location: locationController.text,
-      reporterName: reporterNameController.text,
-      reporterEmail: reporterEmailController.text,
-      imageUrl: null, // TODO: Upload image to storage and get URL
-      resolved: widget.report?.resolved ?? false,
-      createdAt: widget.report?.createdAt ?? DateTime.now(),
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  selectedImage != null
+                      ? 'Uploading image...'
+                      : 'Saving report...',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 16),
+                CircularProgressIndicator(),
+              ],
+            ),
+          ),
+        );
+      },
     );
 
-    final service = FirestoreService();
-    final action =
-        widget.report == null
-            ? service.addReport(report)
-            : service.updateReport(report);
-    action
-        .then((_) {
-          showSuccessDialog(
-            context,
-            title: 'Success!',
-            message:
-                widget.report == null
-                    ? 'Report added successfully!'
-                    : 'Report updated successfully!',
-            onDismiss: () => Navigator.pop(context),
-          );
-        })
-        .catchError((error) {
-          // Handle error if needed
+    try {
+      String? imageUrl;
+
+      // Upload image if selected
+      if (selectedImage != null) {
+        // Validate image before upload
+        if (!_storageService.validateImage(selectedImage!)) {
+          Navigator.pop(context); // Close loading dialog
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: ${error.toString()}'),
+              content: Text(
+                'Invalid image. Please select a valid image file (max 5MB).',
+              ),
               backgroundColor: Colors.red,
             ),
           );
-        });
+          return;
+        }
+
+        // Upload image to Firebase Storage
+        imageUrl = await _storageService.uploadImage(selectedImage!);
+      }
+
+      final tags =
+          tagsController.text
+              .split(',')
+              .map((tag) => tag.trim())
+              .where((tag) => tag.isNotEmpty)
+              .toList();
+
+      final report = Report(
+        id: widget.report?.id ?? Uuid().v4(),
+        title: titleController.text,
+        type: type,
+        description: descController.text,
+        tags: tags,
+        colour: colourController.text,
+        timeFoundLost: DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day,
+          selectedTime.hour,
+          selectedTime.minute,
+        ),
+        location: locationController.text,
+        reporterName: reporterNameController.text,
+        reporterEmail: reporterEmailController.text,
+        imageUrl: imageUrl, // Use uploaded image URL
+        resolved: widget.report?.resolved ?? false,
+        createdAt: widget.report?.createdAt ?? DateTime.now(),
+      );
+
+      final service = FirestoreService();
+      final action =
+          widget.report == null
+              ? service.addReport(report)
+              : service.updateReport(report);
+
+      await action;
+
+      // Close loading dialog
+      Navigator.pop(context);
+
+      showSuccessDialog(
+        context,
+        title: 'Success!',
+        message:
+            widget.report == null
+                ? 'Report added successfully!'
+                : 'Report updated successfully!',
+        onDismiss: () => Navigator.pop(context),
+      );
+    } catch (error) {
+      // Close loading dialog
+      Navigator.pop(context);
+
+      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${error.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   /**
@@ -399,34 +445,92 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                 bottom: BorderSide(color: Colors.purple[200]!, width: 1),
               ),
             ),
-            child: GestureDetector(
-              onTap: _pickImage,
-              child: Container(
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[300]!),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Item Image',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
-                child:
-                    selectedImage != null
-                        ? ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(
-                            selectedImage!,
-                            width: double.infinity,
-                            height: double.infinity,
-                            fit: BoxFit.cover,
+                SizedBox(height: 8),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    child: Stack(
+                      children: [
+                        selectedImage != null
+                            ? ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                selectedImage!,
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                            : Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.upload,
+                                    size: 48,
+                                    color: Colors.grey[600],
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Tap to upload image',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        if (selectedImage != null)
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: GestureDetector(
+                              onTap: _removeImage,
+                              child: Container(
+                                padding: EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  Icons.close,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                              ),
+                            ),
                           ),
-                        )
-                        : Center(
-                          child: Icon(
-                            Icons.upload,
-                            size: 48,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-              ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (selectedImage != null)
+                  Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Text(
+                      'Image selected: ${selectedImage!.path.split('/').last}',
+                      style: TextStyle(color: Colors.green, fontSize: 12),
+                    ),
+                  ),
+              ],
             ),
           ),
 
@@ -665,10 +769,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                           });
                         },
                         decoration: InputDecoration(
-                          hintText:
-                              'Enter hex code (e.g., #FF0000) or color name...',
-                          helperText:
-                              'Allowed: #RRGGBB or names: red, blue, green, yellow, purple, orange, pink, brown, grey',
+                          hintText: 'Enter hex code (e.g., #FF0000)...',
+                          helperText: 'Format: #RRGGBB (6-digit hex code)',
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16,
@@ -691,22 +793,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                           }
                           final v = value.trim();
                           final hexRegex = RegExp(r'^#([A-Fa-f0-9]{6})$');
-                          const allowedNames = [
-                            'red',
-                            'blue',
-                            'green',
-                            'yellow',
-                            'purple',
-                            'orange',
-                            'pink',
-                            'brown',
-                            'grey',
-                            'gray',
-                          ];
                           if (hexRegex.hasMatch(v)) return null;
-                          if (allowedNames.contains(v.toLowerCase()))
-                            return null;
-                          return 'Enter #RRGGBB or a supported name';
+                          return 'Enter a valid 6-digit hex code (e.g., #FF0000)';
                         },
                       ),
                     ),

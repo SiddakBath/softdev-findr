@@ -341,9 +341,9 @@
       <tr>
         <td>Type/format check of "Colour" user input (invalid hex)</td>
         <td>Colour: "#12AB" (invalid) or "beige" (unsupported)</td>
-        <td>Validator error "Enter #RRGGBB or a supported name"; blocked until fixed or cleared.</td>
+        <td>Validator error "Enter a valid 6-digit hex code (e.g., #FF0000)"; blocked until fixed or cleared.</td>
         <td>Error shown; field must be cleared or corrected.</td>
-        <td>None required</td>
+        <td>Updated to only accept hex codes</td>
       </tr>
       <tr>
         <td>Type/format check of "Colour" user input (valid hex)</td>
@@ -353,11 +353,11 @@
         <td>None required</td>
       </tr>
       <tr>
-        <td>Type/format check of "Colour" user input (valid name)</td>
-        <td>Colour: "purple"</td>
-        <td>No error; chip reflects purple.</td>
-        <td>Accepted; chip displays purple.</td>
-        <td>None required</td>
+        <td>Type/format check of "Colour" user input (invalid format)</td>
+        <td>Colour: "purple" (color names no longer supported)</td>
+        <td>Validator error "Enter a valid 6-digit hex code (e.g., #FF0000)"; submission blocked.</td>
+        <td>Error shown; color names no longer accepted.</td>
+        <td>Updated to only accept hex codes</td>
       </tr>
 
       <!-- Tags Field Validation -->
@@ -558,7 +558,7 @@
         <td>Title: "Lost Wallet"; Type: "lost"; Description: sample text; Date/Time: now; Colour: "#000000"; Tags: "wallet, black"; Location: "Library"; Reporter Name/Email: sample</td>
         <td>Report saved to Firestore via <code>addReport</code>; success dialog; return to previous screen on OK.</td>
         <td>Saved; dialog displayed; pop on dismiss.</td>
-        <td>None required</td>
+        <td>Updated to use hex color format</td>
       </tr>
       <tr>
         <td class="mod">Output for valid "Edit report" submission</td>
@@ -566,6 +566,85 @@
         <td>Report updated via <code>updateReport</code>; success dialog; pop on dismiss.</td>
         <td>Updated and confirmed.</td>
         <td>None required</td>
+      </tr>
+
+      <!-- Image Upload Validation -->
+      <tr>
+        <td class="mod">Image upload functionality (optional field)</td>
+        <td>Select image from gallery; all other fields valid</td>
+        <td>Image uploaded to Firebase Storage; URL saved in report; image displayed in UI.</td>
+        <td>Image uploaded and displayed correctly.</td>
+        <td>Implemented Firebase Storage integration</td>
+      </tr>
+      <tr>
+        <td>Image validation - file size limit</td>
+        <td>Select image > 5MB; all other fields valid</td>
+        <td>Error message "Invalid image. Please select a valid image file (max 5MB)"; submission blocked.</td>
+        <td>Error shown; upload prevented.</td>
+        <td>Added file size validation</td>
+      </tr>
+      <tr>
+        <td>Image validation - file format</td>
+        <td>Select non-image file (e.g., .txt, .pdf); all other fields valid</td>
+        <td>Error message for unsupported format; submission blocked.</td>
+        <td>Error shown; upload prevented.</td>
+        <td>Added format validation (jpg, jpeg, png, gif, bmp, webp)</td>
+      </tr>
+      <tr>
+        <td>Image validation - empty file</td>
+        <td>Select 0-byte image file; all other fields valid</td>
+        <td>Error message for empty file; submission blocked.</td>
+        <td>Error shown; upload prevented.</td>
+        <td>Added empty file validation</td>
+      </tr>
+      <tr>
+        <td>Image upload without image (optional)</td>
+        <td>Submit report without selecting image; all other fields valid</td>
+        <td>Report saved successfully with <code>imageUrl = null</code>.</td>
+        <td>Report saved without image.</td>
+        <td>Image field is optional</td>
+      </tr>
+      <tr>
+        <td>Image upload progress feedback</td>
+        <td>Select large image file; submit report</td>
+        <td>Loading dialog shows "Uploading image..." during upload process.</td>
+        <td>Loading dialog displayed during upload.</td>
+        <td>Added upload progress feedback</td>
+      </tr>
+      <tr>
+        <td>Image upload error handling</td>
+        <td>Simulate network error during upload</td>
+        <td>Error message displayed; report submission cancelled.</td>
+        <td>Error handled appropriately.</td>
+        <td>Added comprehensive error handling</td>
+      </tr>
+      <tr>
+        <td>Image removal functionality</td>
+        <td>Select image, then tap remove button (X)</td>
+        <td>Selected image cleared; upload area shows placeholder again.</td>
+        <td>Image removed from selection.</td>
+        <td>Added image removal feature</td>
+      </tr>
+      <tr>
+        <td>Image display in report form</td>
+        <td>Select image from gallery</td>
+        <td>Selected image displayed in upload area with remove button (X).</td>
+        <td>Image preview shown correctly.</td>
+        <td>Updated report form UI with image preview</td>
+      </tr>
+      <tr>
+        <td>Image upload area UI feedback</td>
+        <td>Tap upload area without selecting image</td>
+        <td>Image picker opens; user can select from gallery.</td>
+        <td>Image picker opens correctly.</td>
+        <td>Image picker integration works</td>
+      </tr>
+      <tr>
+        <td>Image selection feedback</td>
+        <td>Select image from gallery</td>
+        <td>Filename shown below upload area with green text.</td>
+        <td>Selection feedback displayed correctly.</td>
+        <td>Added filename display feature</td>
       </tr>
     </tbody>
   </table>
@@ -610,13 +689,7 @@
         <td>Rendered correctly.</td>
         <td>None required</td>
       </tr>
-      <tr>
-        <td>Rendering check of "Colour" from name (fallback)</td>
-        <td><code>colour = "green"</code></td>
-        <td>Neutral grey swatch shown; text "green" displayed.</td>
-        <td>Grey swatch; "green" text shown.</td>
-        <td>None required</td>
-      </tr>
+
       <tr>
         <td>Formatting check of "Date" and "Time" values</td>
         <td><code>timeFoundLost = 2025-08-05T14:35:00</code></td>
@@ -652,8 +725,88 @@
         <td>Email displayed in dialog as expected.</td>
         <td>Updated to show email instead of sending contact request</td>
       </tr>
+      <tr>
+        <td>Image display in report detail screen</td>
+        <td>Report with <code>imageUrl</code> set</td>
+        <td>Large image displayed in detail view with proper sizing.</td>
+        <td>Image displayed correctly in detail view.</td>
+        <td>ReportDetailScreen already supported image display</td>
+      </tr>
+      <tr>
+        <td>Image placeholder for missing images (detail)</td>
+        <td>Report with <code>imageUrl = null</code></td>
+        <td>Placeholder icon displayed instead of image.</td>
+        <td>Placeholder shown correctly.</td>
+        <td>Existing placeholder functionality works</td>
+      </tr>
     </tbody>
   </table>
+
+  <h2>Image Upload & Storage</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>What is to be tested</th>
+        <th>Test data to be used</th>
+        <th>Expected result</th>
+        <th>Actual result</th>
+        <th>Corrections made</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="mod">Firebase Storage upload functionality</td>
+        <td>Select valid image file; submit report</td>
+        <td>Image uploaded to <code>report_images/{uuid}.jpg</code>; download URL returned.</td>
+        <td>Image uploaded successfully to Firebase Storage.</td>
+        <td>Implemented StorageService with Firebase Storage integration</td>
+      </tr>
+      <tr>
+        <td>Image URL storage in Firestore</td>
+        <td>Report with uploaded image</td>
+        <td>Download URL saved in <code>image</code> field in Firestore document.</td>
+        <td>URL stored correctly in database.</td>
+        <td>Updated Report model and Firestore service</td>
+      </tr>
+      <tr>
+        <td>Image metadata storage</td>
+        <td>Upload image with metadata</td>
+        <td>Content type, upload timestamp, and original filename stored in Firebase Storage metadata.</td>
+        <td>Metadata stored correctly.</td>
+        <td>Added SettableMetadata to upload process</td>
+      </tr>
+      <tr>
+        <td>Unique filename generation</td>
+        <td>Upload multiple images</td>
+        <td>Each image gets unique UUID-based filename to prevent conflicts.</td>
+        <td>Unique filenames generated correctly.</td>
+        <td>Implemented UUID-based filename generation</td>
+      </tr>
+      <tr>
+        <td>Image upload error handling - permission denied</td>
+        <td>Simulate Firebase Storage permission error</td>
+        <td>Error message "Permission denied. Please check your authentication status."</td>
+        <td>Appropriate error message displayed.</td>
+        <td>Added specific error handling for permission issues</td>
+      </tr>
+      <tr>
+        <td>Image upload error handling - unauthorized</td>
+        <td>Simulate unauthorized access error</td>
+        <td>Error message "Unauthorized access to storage. Please log in again."</td>
+        <td>Appropriate error message displayed.</td>
+        <td>Added specific error handling for authentication issues</td>
+      </tr>
+      <tr>
+        <td>Image upload error handling - network failure</td>
+        <td>Simulate network connectivity issues</td>
+        <td>Generic error message "Failed to upload image: [error details]"</td>
+        <td>Error message displayed with details.</td>
+        <td>Added comprehensive error handling</td>
+      </tr>
+    </tbody>
+  </table>
+
+
 
   <h2>Report Card Widget</h2>
   <table>
@@ -688,13 +841,7 @@
         <td>Hidden as expected.</td>
         <td>None required</td>
       </tr>
-      <tr>
-        <td>Output for image placeholder on error</td>
-        <td><code>imageUrl</code> points to broken URL</td>
-        <td><code>errorBuilder</code> renders placeholder.</td>
-        <td>Placeholder shown.</td>
-        <td>None required</td>
-      </tr>
+
       <tr>
         <td>Truncation check of "Description" display</td>
         <td>Long description (> 2 lines)</td>
@@ -711,10 +858,31 @@
       </tr>
       <tr>
         <td>Mapping check of background color from "colour" value</td>
-        <td><code>colour = "green"</code> and non-mapped value</td>
-        <td>Known names map to palette; unknown names produce stable hash color.</td>
-        <td>Colors applied as expected.</td>
+        <td><code>colour = "#00FF00"</code> (hex)</td>
+        <td>Hex code parsed and applied as background color.</td>
+        <td>Green color applied correctly.</td>
         <td>None required</td>
+      </tr>
+      <tr>
+        <td>Image display in report cards</td>
+        <td>Report with <code>imageUrl</code> set</td>
+        <td>Image displayed in card with proper aspect ratio and fit.</td>
+        <td>Image displayed correctly in cards.</td>
+        <td>ReportCard already supported image display</td>
+      </tr>
+      <tr>
+        <td>Image placeholder for missing images (cards)</td>
+        <td>Report with <code>imageUrl = null</code></td>
+        <td>Placeholder icon displayed instead of image.</td>
+        <td>Placeholder shown correctly.</td>
+        <td>Existing placeholder functionality works</td>
+      </tr>
+      <tr>
+        <td>Image error handling - broken URL (cards)</td>
+        <td>Report with invalid <code>imageUrl</code></td>
+        <td>Error builder shows placeholder instead of broken image.</td>
+        <td>Error handling works correctly.</td>
+        <td>Existing error handling works</td>
       </tr>
     </tbody>
   </table>
@@ -844,7 +1012,7 @@
   <h2>Notes</h2>
   <ul>
     <li><strong>Required Fields:</strong> All fields are now required except for the image field. This includes: Title, Description, Colour, Tags, Location, Reporter Name, and Reporter Email.</li>
-    <li>Colour validation: field is required and must be a 6-digit hex (<code>#RRGGBB</code>) or one of the supported names: red, blue, green, yellow, purple, orange, pink, brown, grey/gray.</li>
+    <li>Colour validation: field is required and must be a 6-digit hex code (<code>#RRGGBB</code>) format only. Color names are no longer supported.</li>
     <li>Title validation: 3-100 characters required.</li>
     <li>Description validation: 10-500 characters required.</li>
     <li>Tags validation: At least one tag required, maximum 10 tags, each 2-20 characters, only letters/numbers/spaces allowed.</li>
@@ -853,7 +1021,11 @@
     <li>Reporter Email validation: Valid email format required, maximum 100 characters.</li>
     <li>Date picker enforces range [2020-01-01, today]; time validation prevents future date/time combinations.</li>
     <li>Search and type filtering on Home are applied client-side on the streamed result set.</li>
-    <li>All tested modules function correctly per the current codebase; no corrections were required.</li>
+    <li><strong>Image Upload:</strong> Optional field with comprehensive validation. Supported formats: JPG, JPEG, PNG, GIF, BMP, WEBP. Maximum file size: 5MB. Images are uploaded to Firebase Storage with unique UUID-based filenames and metadata.</li>
+    <li>Image validation includes file size, format, and existence checks. Empty files are rejected. No existence check is performed since the field is optional.</li>
+    <li>Image upload provides progress feedback and comprehensive error handling for network issues, permission problems, and authentication errors.</li>
+    <li>Images are displayed in report cards, detail screens, and form preview with proper error handling for broken URLs.</li>
+    <li>All tested modules function correctly per the current codebase; image upload functionality has been successfully implemented.</li>
   </ul>
 </body>
 </html> 

@@ -321,42 +321,27 @@ class ReportCard extends StatelessWidget {
    * 
    * Input: None (uses report data)
    * Processing: 
-   * - Map report's color field to Flutter colors
-   * - Use hash-based color generation for unknown colors
-   * - Provide fallback to predefined color palette
+   * - Parse hex color code from report's colour field
+   * - Convert to Flutter Color object
+   * - Use grey as fallback if parsing fails
    * Output: Color - Background color for the image section
    */
   Color _getImageColor() {
-    // Use the report's colour field or generate a color based on the title
-    switch (report.colour.toLowerCase()) {
-      case 'blue':
-        return Colors.blue[300]!;
-      case 'yellow':
-        return Colors.yellow[300]!;
-      case 'grey':
-      case 'gray':
-        return Colors.grey[400]!;
-      case 'red':
-        return Colors.red[300]!;
-      case 'green':
-        return Colors.green[300]!;
-      case 'purple':
-        return Colors.purple[300]!;
-      case 'orange':
-        return Colors.orange[300]!;
-      default:
-        // Generate a color based on the title hash for consistency
-        final hash = report.title.hashCode;
-        final colors = [
-          Colors.blue[300]!,
-          Colors.green[300]!,
-          Colors.orange[300]!,
-          Colors.purple[300]!,
-          Colors.red[300]!,
-          Colors.teal[300]!,
-        ];
-        return colors[hash.abs() %
-            colors.length]; // Use modulo for consistent color selection
+    // Parse hex color from the report's colour field
+    if (report.colour.startsWith('#')) {
+      try {
+        final hexCode = report.colour.substring(1);
+        if (hexCode.length == 6) {
+          return Color(
+            int.parse(hexCode, radix: 16) + 0xFF000000, // Add alpha channel
+          );
+        }
+      } catch (e) {
+        // Fall through to grey if parsing fails
+      }
     }
+
+    // Fallback: Use grey for invalid colors
+    return Colors.grey[400]!;
   }
 }
