@@ -208,36 +208,32 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 final reports = snapshot.data!;
 
-                // Apply client-side filtering for search and type selection
-                final filteredReports =
-                    reports.where((report) {
-                      // Filter by selected type (lost/found)
-                      if (selectedType != report.type) return false;
+                // Apply client-side filtering for search and type selection using custom linear search
+                final filteredReports = <Report>[];
+                for (final report in reports) {
+                  // Filter by selected type (lost/found)
+                  if (selectedType != report.type) continue;
 
-                      // Filter by search query if text is entered
-                      if (_searchController.text.isNotEmpty) {
-                        final query = _searchController.text.toLowerCase();
-                        return report.title.toLowerCase().contains(query) ||
-                            report.description.toLowerCase().contains(query) ||
-                            report.tags.any(
-                              (tag) => tag.toLowerCase().contains(query),
-                            );
-                      }
+                  // Filter by search query if text is entered using custom linear search
+                  if (_searchController.text.isNotEmpty) {
+                    final query = _searchController.text.toLowerCase();
+                    final searchList = [
+                      report.title.toLowerCase(),
+                      report.description.toLowerCase(),
+                      ...report.tags.map((tag) => tag.toLowerCase()),
+                    ];
 
-                      return true;
-                    }).toList();
-
-                // Apply sorting based on selected sort option
-                final sortedReports = List<Report>.from(filteredReports);
-                sortedReports.sort((a, b) {
-                  if (selectedSort == 'latest') {
-                    // Sort by createdAt descending (latest first)
-                    return b.createdAt.compareTo(a.createdAt);
-                  } else {
-                    // Sort by createdAt ascending (oldest first)
-                    return a.createdAt.compareTo(b.createdAt);
+                    if (!_linearSearch(searchList, query)) continue;
                   }
-                });
+
+                  filteredReports.add(report);
+                }
+
+                // Apply custom selection sort based on selected sort option
+                final sortedReports = _selectionSort(
+                  filteredReports,
+                  selectedSort,
+                );
 
                 // Display reports in a responsive grid layout
                 return GridView.builder(
@@ -309,9 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                         if (shouldResolve == true) {
                           // Mark report as resolved in database
-                          await firestore.markResolved(
-                            sortedReports[index].id,
-                          );
+                          await firestore.markResolved(sortedReports[index].id);
                           // Show success message
                           showSuccessDialog(
                             context,
@@ -382,5 +376,74 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  /**
+   * Custom selection sort algorithm implementation
+   * 
+   * Purpose: sorts a list of reports by creation date
+   * Input: List<Report> arrElements, String sortType
+   * Output: List<Report> - a sorted array of reports
+   */
+  List<Report> _selectionSort(List<Report> arrElements, String sortType) {
+    final n = arrElements.length;
+
+    for (int i = 0; i < n; i++) {
+      // select the smallest item
+      int smallest = i;
+
+      // compare smallest to the rest of the array
+      for (int j = i + 1; j < n; j++) {
+        bool shouldSwap = false;
+
+        if (sortType == 'latest') {
+          // Sort by createdAt descending (latest first)
+          shouldSwap = arrElements[j].createdAt.isAfter(
+            arrElements[smallest].createdAt,
+          );
+        } else {
+          // Sort by createdAt ascending (oldest first)
+          shouldSwap = arrElements[j].createdAt.isBefore(
+            arrElements[smallest].createdAt,
+          );
+        }
+
+        if (shouldSwap) {
+          // update the index value of smallest
+          smallest = j;
+        }
+      }
+
+      // the smallest item in the array has been found
+      // so swap it with the current element
+      if (smallest != i) {
+        // swap arrElements[smallest] AND arrElements[i]
+        final temp = arrElements[smallest];
+        arrElements[smallest] = arrElements[i];
+        arrElements[i] = temp;
+      }
+    }
+
+    return arrElements;
+  }
+
+  /**
+   * Custom linear search algorithm implementation
+   * 
+   * Purpose: searches through a list of elements for a specific query
+   * Input: List<String> searchList, String searchItem
+   * Output: bool - True if item found, False if not
+   */
+  bool _linearSearch(List<String> searchList, String searchItem) {
+    bool found = false;
+
+    for (String eachItem in searchList) {
+      if (eachItem.contains(searchItem)) {
+        found = true;
+        break; // exit loop once found
+      }
+    }
+
+    return found;
   }
 }
