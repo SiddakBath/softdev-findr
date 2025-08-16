@@ -137,6 +137,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: TextField(
                           controller: _searchController,
+                          onChanged: (value) {
+                            setState(() {
+                              // Trigger rebuild when search text changes
+                            });
+                          },
                           decoration: const InputDecoration(
                             hintText: 'Search',
                             hintStyle: TextStyle(color: Colors.grey),
@@ -214,16 +219,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Filter by selected type (lost/found)
                   if (selectedType != report.type) continue;
 
-                  // Filter by search query if text is entered using custom linear search
+                  // Filter by search query if text is entered - search only titles
                   if (_searchController.text.isNotEmpty) {
                     final query = _searchController.text.toLowerCase();
-                    final searchList = [
-                      report.title.toLowerCase(),
-                      report.description.toLowerCase(),
-                      ...report.tags.map((tag) => tag.toLowerCase()),
-                    ];
+                    final title = report.title.toLowerCase();
 
-                    if (!_linearSearch(searchList, query)) continue;
+                    if (!title.contains(query)) continue;
                   }
 
                   filteredReports.add(report);

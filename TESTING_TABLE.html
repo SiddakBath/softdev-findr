@@ -471,34 +471,20 @@
         <td>None required</td>
       </tr>
 
-      <!-- Reporter Email Field Validation -->
+      <!-- Reporter Email Field (Auto-populated) -->
       <tr>
-        <td class="mod">Existence check of "Reporter Email" user input</td>
-        <td>Reporter Email: ""; other fields valid</td>
-        <td>Validator error "Email is required"; submission blocked.</td>
-        <td>Error shown; not submitted.</td>
-        <td>None required</td>
+        <td class="mod">Reporter Email auto-population from user account</td>
+        <td>Create new report while signed in</td>
+        <td>Email field shows current user's email; not editable.</td>
+        <td>Email auto-populated from Firebase Auth.</td>
+        <td>Updated to use current user's email</td>
       </tr>
       <tr>
-        <td>Type/format check of "Reporter Email" user input (valid format)</td>
-        <td>Reporter Email: "user@example.com"; other fields valid</td>
-        <td>No error; email accepted.</td>
-        <td>Accepted as expected.</td>
-        <td>None required</td>
-      </tr>
-      <tr>
-        <td>Type/format check of "Reporter Email" user input (invalid format)</td>
-        <td>Reporter Email: "invalid-email"; other fields valid</td>
-        <td>Validator error "Please enter a valid email address"; submission blocked.</td>
-        <td>Error shown; not submitted.</td>
-        <td>None required</td>
-      </tr>
-      <tr>
-        <td>Range check of "Reporter Email" user input (maximum length)</td>
-        <td>Reporter Email: 101+ characters; other fields valid</td>
-        <td>Validator error "Email must be less than 100 characters"; submission blocked.</td>
-        <td>Error shown; not submitted.</td>
-        <td>None required</td>
+        <td>Reporter Email validation (automatic)</td>
+        <td>User account has valid email format</td>
+        <td>Email automatically validated by Firebase Auth; no manual validation needed.</td>
+        <td>Email from Firebase Auth is always valid.</td>
+        <td>Removed manual email validation</td>
       </tr>
 
       <!-- Date and Time Field Validation -->
@@ -555,10 +541,10 @@
       </tr>
       <tr>
         <td class="mod">Output for valid "Create report" submission</td>
-        <td>Title: "Lost Wallet"; Type: "lost"; Description: sample text; Date/Time: now; Colour: "#000000"; Tags: "wallet, black"; Location: "Library"; Reporter Name/Email: sample</td>
+        <td>Title: "Lost Wallet"; Type: "lost"; Description: sample text; Date/Time: now; Colour: "#000000"; Tags: "wallet, black"; Location: "Library"; Reporter Name: sample; Email: auto-populated</td>
         <td>Report saved to Firestore via <code>addReport</code>; success dialog; return to previous screen on OK.</td>
         <td>Saved; dialog displayed; pop on dismiss.</td>
-        <td>Updated to use hex color format</td>
+        <td>Updated to use hex color format and auto-populated email</td>
       </tr>
       <tr>
         <td class="mod">Output for valid "Edit report" submission</td>
@@ -1011,14 +997,14 @@
 
   <h2>Notes</h2>
   <ul>
-    <li><strong>Required Fields:</strong> All fields are now required except for the image field. This includes: Title, Description, Colour, Tags, Location, Reporter Name, and Reporter Email.</li>
+    <li><strong>Required Fields:</strong> All fields are now required except for the image field. This includes: Title, Description, Colour, Tags, Location, and Reporter Name. Reporter Email is automatically set from the user's Firebase Auth account.</li>
     <li>Colour validation: field is required and must be a 6-digit hex code (<code>#RRGGBB</code>) format only. Color names are no longer supported.</li>
     <li>Title validation: 3-100 characters required.</li>
     <li>Description validation: 10-500 characters required.</li>
     <li>Tags validation: At least one tag required, maximum 10 tags, each 2-20 characters, only letters/numbers/spaces allowed.</li>
     <li>Location validation: 3-100 characters required.</li>
     <li>Reporter Name validation: 2-50 characters required, only letters and spaces allowed.</li>
-    <li>Reporter Email validation: Valid email format required, maximum 100 characters.</li>
+    <li>Reporter Email: Automatically populated from Firebase Auth current user's email; no manual input required.</li>
     <li>Date picker enforces range [2020-01-01, today]; time validation prevents future date/time combinations.</li>
     <li>Search and type filtering on Home are applied client-side on the streamed result set.</li>
     <li><strong>Image Upload:</strong> Optional field with comprehensive validation. Supported formats: JPG, JPEG, PNG, GIF, BMP, WEBP. Maximum file size: 5MB. Images are uploaded to Firebase Storage with unique UUID-based filenames and metadata.</li>
