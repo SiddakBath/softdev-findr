@@ -20,6 +20,7 @@ import '../widgets/success_dialog.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 /**
  * Report form screen for creating and editing reports
@@ -185,6 +186,55 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         // Keep current color if parsing fails
       }
     }
+  }
+
+  /**
+   * Show color picker dialog
+   * 
+   * Input: None
+   * Processing: 
+   * - Open color picker dialog with current selected color
+   * - Update selectedColor and colourController when color is picked
+   * - Convert picked color to hex format for storage
+   * Output: Future<void> - Completes when color selection is finished
+   */
+  Future<void> _showColorPicker() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Pick a color'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: selectedColor,
+              onColorChanged: (Color color) {
+                setState(() {
+                  selectedColor = color;
+                });
+              },
+              pickerAreaHeightPercent: 0.8,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Select'),
+              onPressed: () {
+                // Convert color to hex format
+                final hexColor = '#${selectedColor.value.toRadixString(16).substring(2)}';
+                colourController.text = hexColor;
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   /**
@@ -962,20 +1012,28 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                         },
                         decoration: InputDecoration(
                           hintText: 'Enter hex code (e.g., #FF0000)...',
-                          helperText: 'Format: #RRGGBB (6-digit hex code)',
+                          helperText: 'Format: #RRGGBB (6-digit hex code) or click the color box to pick',
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 12,
                           ),
-                          suffixIcon: Container(
-                            margin: EdgeInsets.all(8),
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: selectedColor,
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: Colors.grey[300]!),
+                          suffixIcon: GestureDetector(
+                            onTap: _showColorPicker,
+                            child: Container(
+                              margin: EdgeInsets.all(8),
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: selectedColor,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: Icon(
+                                Icons.color_lens,
+                                color: Colors.white,
+                                size: 16,
+                              ),
                             ),
                           ),
                         ),
