@@ -12,6 +12,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/report.dart';
 import '../services/firestore_service.dart';
 import '../services/storage_service.dart';
@@ -79,7 +80,6 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   final colourController = TextEditingController();
   final locationController = TextEditingController();
   final reporterNameController = TextEditingController();
-  final reporterEmailController = TextEditingController();
   final tagsController = TextEditingController();
 
   // Form state variables
@@ -112,7 +112,6 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
       colourController.text = r.colour;
       locationController.text = r.location;
       reporterNameController.text = r.reporterName;
-      reporterEmailController.text = r.reporterEmail;
       tagsController.text = r.tags.join(
         ', ',
       ); // Convert tags list to comma-separated string
@@ -202,14 +201,17 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
    * Output: void (none)
    */
   void submit() async {
-    if (!formKey.currentState!.validate()) return;
+    if (!formKey.currentState!.validate()) {
+      _showValidationErrorDialog(
+        'Please fix the validation errors in the form fields before submitting.',
+      );
+      return;
+    }
 
     // Check date/time validation
     final dateTimeError = _validateDateTime();
     if (dateTimeError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(dateTimeError), backgroundColor: Colors.red),
-      );
+      _showValidationErrorDialog(dateTimeError);
       return;
     }
 
@@ -251,13 +253,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         // Validate image before upload
         if (!_storageService.validateImage(selectedImage!)) {
           Navigator.pop(context); // Close loading dialog
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Invalid image. Please select a valid image file (max 5MB).',
-              ),
-              backgroundColor: Colors.red,
-            ),
+          _showValidationErrorDialog(
+            'Invalid image. Please select a valid image file (max 5MB).',
           );
           return;
         }
@@ -289,7 +286,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         ),
         location: locationController.text,
         reporterName: reporterNameController.text,
-        reporterEmail: reporterEmailController.text,
+        reporterEmail: FirebaseAuth.instance.currentUser?.email ?? '',
         imageUrl: imageUrl, // Use uploaded image URL
         resolved: widget.report?.resolved ?? false,
         createdAt: widget.report?.createdAt ?? DateTime.now(),
@@ -350,6 +347,55 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
         selectedDate = picked;
       });
     }
+  }
+
+  /**
+   * Show validation error dialog
+   * 
+   * Input: String message - The validation error message to display
+   * Processing: 
+   * - Display a dialog with the validation error message
+   * - Provide an OK button to dismiss the dialog
+   * Output: void (none)
+   */
+  void _showValidationErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.error_outline, color: Colors.red, size: 24),
+              SizedBox(width: 8),
+              Text(
+                'Validation Error',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: Text(message, style: TextStyle(fontSize: 16)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'OK',
+                style: TextStyle(
+                  color: Colors.purple,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   /**
@@ -744,63 +790,6 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                       ],
                     ),
 
-                    SizedBox(height: 20),
-
-                    // Color Field
-                    Text(
-                      'Colour',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.purple[200]!),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: TextFormField(
-                        controller: colourController,
-                        onChanged: (value) {
-                          setState(() {
-                            _updateSelectedColor(value);
-                          });
-                        },
-                        decoration: InputDecoration(
-                          hintText: 'Enter hex code (e.g., #FF0000)...',
-                          helperText: 'Format: #RRGGBB (6-digit hex code)',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          suffixIcon: Container(
-                            margin: EdgeInsets.all(8),
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: selectedColor,
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: Colors.grey[300]!),
-                            ),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Color is required';
-                          }
-                          final v = value.trim();
-                          final hexRegex = RegExp(r'^#([A-Fa-f0-9]{6})$');
-                          if (hexRegex.hasMatch(v)) return null;
-                          return 'Enter a valid 6-digit hex code (e.g., #FF0000)';
-                        },
-                      ),
-                    ),
-
-                    SizedBox(height: 20),
-
                     // Tags Field
                     Text(
                       'Tags',
@@ -949,6 +938,61 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
                     SizedBox(height: 20),
 
+                    // Color Field
+                    Text(
+                      'Colour',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.purple[200]!),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextFormField(
+                        controller: colourController,
+                        onChanged: (value) {
+                          setState(() {
+                            _updateSelectedColor(value);
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Enter hex code (e.g., #FF0000)...',
+                          helperText: 'Format: #RRGGBB (6-digit hex code)',
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          suffixIcon: Container(
+                            margin: EdgeInsets.all(8),
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: selectedColor,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: Colors.grey[300]!),
+                            ),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Color is required';
+                          }
+                          final v = value.trim();
+                          final hexRegex = RegExp(r'^#([A-Fa-f0-9]{6})$');
+                          if (hexRegex.hasMatch(v)) return null;
+                          return 'Enter a valid 6-digit hex code (e.g., #FF0000)';
+                        },
+                      ),
+                    ),
+
+                    SizedBox(height: 20),
+
                     // Reporter Name Field
                     Text(
                       'Reporter Name',
@@ -988,52 +1032,6 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                             r'^[a-zA-Z\s]+$',
                           ).hasMatch(value.trim())) {
                             return 'Name can only contain letters and spaces';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-
-                    SizedBox(height: 20),
-
-                    // Reporter Email Field
-                    Text(
-                      'Reporter Email',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.purple[200]!),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: TextFormField(
-                        controller: reporterEmailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          hintText: 'Enter your email address...',
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Email is required';
-                          }
-                          final emailRegex = RegExp(
-                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-                          );
-                          if (!emailRegex.hasMatch(value.trim())) {
-                            return 'Please enter a valid email address';
-                          }
-                          if (value.trim().length > 100) {
-                            return 'Email must be less than 100 characters';
                           }
                           return null;
                         },

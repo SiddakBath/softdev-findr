@@ -125,6 +125,7 @@ class ReportCard extends StatelessWidget {
                           ),
                         )
                         : _buildImagePlaceholder(), // Show placeholder if no image
+
                     // Owner action menu (three dots) - only visible to report owner
                     if (isOwner &&
                         (onEdit != null ||
@@ -168,7 +169,11 @@ class ReportCard extends StatelessWidget {
                                       value: 'resolve',
                                       child: Row(
                                         children: [
-                                          Icon(Icons.check, size: 20),
+                                          Icon(
+                                            Icons.check,
+                                            size: 20,
+                                            color: Colors.green,
+                                          ),
                                           SizedBox(width: 8),
                                           Text('Mark as resolved'),
                                         ],
@@ -222,17 +227,44 @@ class ReportCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Report title
-                    Text(
-                      report.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                      maxLines: 1, // Limit to single line
-                      overflow:
-                          TextOverflow.ellipsis, // Show ellipsis if truncated
+                    // Report title with resolved indicator
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            report.title,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                            maxLines: 1, // Limit to single line
+                            overflow:
+                                TextOverflow
+                                    .ellipsis, // Show ellipsis if truncated
+                          ),
+                        ),
+                        // Resolved indicator
+                        if (report.resolved)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Text(
+                              'RESOLVED',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
 
                     const SizedBox(height: 6),

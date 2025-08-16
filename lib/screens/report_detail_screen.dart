@@ -210,23 +210,60 @@ class ReportDetailScreen extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () async {
                 if (isOwner) {
-                  // Resolve action for owner
-                  final shouldResolve = await showConfirmationDialog(
-                    context,
-                    title: 'Mark as Resolved',
-                    message:
-                        'Are you sure you want to mark this report as resolved?',
-                    confirmText: 'Resolve',
-                    cancelText: 'Cancel',
-                  );
-
-                  if (shouldResolve == true) {
-                    await _firestoreService.markResolved(report.id);
-                    showSuccessDialog(
-                      context,
-                      title: 'Success!',
-                      message: 'Report marked as resolved!',
+                  if (report.resolved) {
+                    // Report is already resolved - show info dialog
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text(
+                            'Report Status',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          content: const Text(
+                            'This report has already been marked as resolved.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: Text(
+                                'OK',
+                                style: TextStyle(
+                                  color: Colors.green[600],
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     );
+                  } else {
+                    // Resolve action for owner
+                    final shouldResolve = await showConfirmationDialog(
+                      context,
+                      title: 'Mark as Resolved',
+                      message:
+                          'Are you sure you want to mark this report as resolved?',
+                      confirmText: 'Resolve',
+                      cancelText: 'Cancel',
+                    );
+
+                    if (shouldResolve == true) {
+                      await _firestoreService.markResolved(report.id);
+                      showSuccessDialog(
+                        context,
+                        title: 'Success!',
+                        message: 'Report marked as resolved!',
+                      );
+                    }
                   }
                 } else {
                   // Show reporter's email for non-owner
@@ -297,7 +334,10 @@ class ReportDetailScreen extends StatelessWidget {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple[600],
+                backgroundColor:
+                    isOwner && report.resolved
+                        ? Colors.green
+                        : Colors.purple[600],
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -305,7 +345,9 @@ class ReportDetailScreen extends StatelessWidget {
                 elevation: 0,
               ),
               child: Text(
-                isOwner ? 'Resolve' : 'Show Contact',
+                isOwner
+                    ? (report.resolved ? 'Resolved' : 'Resolve')
+                    : 'Show Contact',
                 style: const TextStyle(
                   fontSize: 16,
                   color: Colors.white,

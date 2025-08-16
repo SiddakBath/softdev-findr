@@ -2,14 +2,15 @@ BROOOO
 
 THE TEACHER SAID THAT IT'S IMPORTANT THAT CONVENTIONS ARE FOLLOWED AND BUTTONS LOOK LIKE BUTTONS
 
-YOU NEED TO WRITE OUTPUT: VOID if there's no output the teacher said
-
-ADD SELECTION SORT STUFF - need search and sort
 
 
 
-
-EDITS MADE (FOR DOCUMENTATION)
+EDITS MADE (FOR DOCUMENTATION) - ADD FOR CRITERIA 8
 - "Show Contact" instead of "Contact" for clarity
 - Improved colour textbox and widget for visual appearance
 - Added strong password validation
+- Moved Colour field below Location field in report form
+- Added validation error dialog for report form validation failures
+- Added a logout button in the appbar.
+- Added a sign up button in the authentication
+- added resolve tag in the report card
