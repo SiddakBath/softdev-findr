@@ -27,9 +27,12 @@ import 'screens/home_screen.dart';
  * - Firebase Storage: Utilised for storing and retrieving user-uploaded images associated with reports, supporting large file uploads and secure access.
  * 
  * Data Types:
+ * - int, double, String, bool, List, Map: Standard Dart data types used throughout the app for representing values, collections, and key-value pairs.
+ * 
+ * Data Structures (Models):
  * - User: Represents authenticated individuals interacting with the app; essential for associating reports with specific users and managing permissions.
- * - Report: Custom model encapsulating all details of a lost or found item (e.g., description, status, image URL); central to the app’s core functionality.
- * - Image: Represents media files attached to reports, providing visual context and aiding in item identification.
+ * - Report (Record): Custom model used because it encapsulates all details of a lost or found item (e.g., description, status, image URL); central to the app’s core functionality.
+ * - Image (Record): Represents media files attached to reports, providing visual context and aiding in item identification.
  * 
  * Data Structures:
  * - List<Report>: Used to efficiently manage and display collections of reports (e.g., in lists or feeds), supporting dynamic updates and filtering.
