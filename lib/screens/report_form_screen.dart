@@ -842,6 +842,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                       ],
                     ),
 
+                    SizedBox(height: 20),
+
                     // Tags Field
                     Text(
                       'Tags',
@@ -1015,8 +1017,6 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                         },
                         decoration: InputDecoration(
                           hintText: 'Enter hex code (e.g., #FF0000)...',
-                          helperText:
-                              'Format: #RRGGBB (6-digit hex code) or click the color box to pick',
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16,
