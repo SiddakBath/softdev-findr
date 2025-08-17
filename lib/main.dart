@@ -21,6 +21,22 @@ import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 
 /**
+ * Data Sources:
+ * - Firebase Authentication: Used for secure user sign-up, login, and session management, ensuring only authorized users can create or manage reports.
+ * - Firebase Firestore: Chosen for its scalable, real-time NoSQL database capabilities, enabling efficient storage and live updates of lost and found reports.
+ * - Firebase Storage: Utilised for storing and retrieving user-uploaded images associated with reports, supporting large file uploads and secure access.
+ * 
+ * Data Types:
+ * - User: Represents authenticated individuals interacting with the app; essential for associating reports with specific users and managing permissions.
+ * - Report: Custom model encapsulating all details of a lost or found item (e.g., description, status, image URL); central to the app’s core functionality.
+ * - Image: Represents media files attached to reports, providing visual context and aiding in item identification.
+ * 
+ * Data Structures:
+ * - List<Report>: Used to efficiently manage and display collections of reports (e.g., in lists or feeds), supporting dynamic updates and filtering.
+ * - Map<String, dynamic>: Enables flexible serialisation/deserialisation of report data for Firestore storage, allowing for easy conversion between Dart objects and Firestore documents.
+ */
+
+/**
  * Main application entry point
  * 
  * Input: None
