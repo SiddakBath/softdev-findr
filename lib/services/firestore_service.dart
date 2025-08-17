@@ -22,6 +22,10 @@ import '../models/report.dart';
  * Provides methods for managing lost and found reports in the Firestore database.
  * Handles real-time data streaming, filtering, and status updates for reports.
  * 
+ * Firebase Streams data source used for its real-time capabilities,
+ * seamless automatic updates to the UI when data changes,
+ * and efficient handling of collaborative multi-user scenarios without manual refresh.
+ * 
  * Key Features:
  * - Real-time report streaming with optional type filtering
  * - Report creation, updating, and deletion
