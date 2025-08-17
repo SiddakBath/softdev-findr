@@ -211,7 +211,6 @@ class _SignupScreenState extends State<SignupScreen> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: const InputDecoration(
                           hintText: 'example@example.com',
-                          helperText: 'Format: name@example.com',
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16,
