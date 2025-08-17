@@ -1,9 +1,16 @@
-// This is a basic Flutter widget test.
+// widget_test.dart
+//
+// Basic Flutter widget test for the Findr application
 //
 // To perform an interaction with a widget in your test, use the WidgetTester
 // utility in the flutter_test package. For example, you can send tap and scroll
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
+//
+// Author: Siddak Bath
+// Created: [17/07/2025]
+// Last Modified: [05/08/2025]
+// Version: v1
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,7 +20,7 @@ import 'package:findr/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(MyApp());
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

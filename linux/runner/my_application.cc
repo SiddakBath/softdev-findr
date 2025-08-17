@@ -1,3 +1,14 @@
+// my_application.cc
+// 
+// Main application implementation for the Findr Linux application
+// 
+// Provides the entry point for the Flutter application on Linux platform.
+// 
+// Author: Siddak Bath
+// Created: [17/07/2025]
+// Last Modified: [05/08/2025]
+// Version: v1
+
 #include "my_application.h"
 
 #include <flutter_linux/flutter_linux.h>

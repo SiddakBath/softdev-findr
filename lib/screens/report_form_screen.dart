@@ -9,6 +9,7 @@
  * Author: Siddak Bath
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
+ * Version: v1
  */
 
 import 'package:flutter/material.dart';
@@ -226,7 +227,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
               child: const Text('Select'),
               onPressed: () {
                 // Convert color to hex format
-                final hexColor = '#${selectedColor.value.toRadixString(16).substring(2)}';
+                final hexColor =
+                    '#${selectedColor.value.toRadixString(16).substring(2)}';
                 colourController.text = hexColor;
                 Navigator.of(context).pop();
               },
@@ -869,6 +871,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                           if (value == null || value.trim().isEmpty) {
                             return 'At least one tag is required';
                           }
+
                           final tags =
                               value
                                   .split(',')
@@ -1012,7 +1015,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                         },
                         decoration: InputDecoration(
                           hintText: 'Enter hex code (e.g., #FF0000)...',
-                          helperText: 'Format: #RRGGBB (6-digit hex code) or click the color box to pick',
+                          helperText:
+                              'Format: #RRGGBB (6-digit hex code) or click the color box to pick',
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(
                             horizontal: 16,

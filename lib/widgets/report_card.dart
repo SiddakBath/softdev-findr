@@ -9,6 +9,7 @@
  * Author: Siddak Bath
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
+ * Version: v1
  */
 
 import 'package:flutter/material.dart';
@@ -125,7 +126,6 @@ class ReportCard extends StatelessWidget {
                           ),
                         )
                         : _buildImagePlaceholder(), // Show placeholder if no image
-
                     // Owner action menu (three dots) - only visible to report owner
                     if (isOwner &&
                         (onEdit != null ||

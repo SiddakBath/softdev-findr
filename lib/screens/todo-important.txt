@@ -14,3 +14,5 @@ EDITS MADE (FOR DOCUMENTATION) - ADD FOR CRITERIA 8
 - Added a logout button in the appbar.
 - Added a sign up button in the authentication
 - added resolve tag in the report card
+
+- ADDED REAL-TIME STREAMING

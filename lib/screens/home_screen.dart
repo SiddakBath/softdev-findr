@@ -9,6 +9,7 @@
  * Author: Siddak Bath
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
+ * Version: v1
  */
 
 import 'package:flutter/material.dart';
@@ -60,8 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // UI state variables
   String? filter; // Current filter for Firestore query
-  String selectedType = 'lost'; // Current type filter ('lost' or 'found')
-  String selectedSort = 'latest'; // Current sort option ('latest' or 'oldest')
+  String selectedType = 'lost'; // Default type filter ('lost' or 'found')
+  String selectedSort = 'latest'; // Default sort option ('latest' or 'oldest')
   final TextEditingController _searchController =
       TextEditingController(); // Search input controller
 

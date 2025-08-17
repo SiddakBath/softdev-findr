@@ -1,3 +1,14 @@
+// main.cpp
+// 
+// Main entry point for the Findr Windows application
+// 
+// Provides the entry point for the Flutter application on Windows platform.
+// 
+// Author: Siddak Bath
+// Created: [17/07/2025]
+// Last Modified: [05/08/2025]
+// Version: v1
+
 #include <flutter/dart_project.h>
 #include <flutter/flutter_view_controller.h>
 #include <windows.h>
