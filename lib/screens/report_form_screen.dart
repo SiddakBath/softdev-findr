@@ -95,7 +95,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   final StorageService _storageService = StorageService();
 
   /**
-   * Initialize form with existing report data if editing
+   * Initialise form with existing report data if editing
    * 
    * Input: None (uses widget.report)
    * Processing: 
@@ -107,7 +107,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize form with existing report data if editing
+    // Initialise form with existing report data if editing
     if (widget.report != null) {
       final r = widget.report!;
       titleController.text = r.title;

@@ -57,7 +57,7 @@ class Report {
    * Constructor for creating a new Report instance
    * 
    * Input: All required report parameters (id, title, type, description, tags, colour, timeFoundLost, location, reporterName, reporterEmail, resolved, createdAt) and optional imageUrl
-   * Processing: Initialize Report object with provided parameters
+   * Processing: Initialise Report object with provided parameters
    * Output: Report instance
    */
   Report({
@@ -114,7 +114,7 @@ class Report {
    * Input: None (uses instance data)
    * Processing: 
    * - Convert Report object to Map format
-   * - Serialize DateTime objects to ISO 8601 strings
+   * - Serialise DateTime objects to ISO 8601 strings
    * - Prepare data for Firestore storage
    * Output: Map<String, dynamic> - Firestore-compatible document data
    */

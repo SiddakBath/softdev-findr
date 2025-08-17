@@ -48,7 +48,7 @@ class ReportCard extends StatelessWidget {
    * Constructor for ReportCard widget
    * 
    * Input: Report report, VoidCallback? onTap, onDelete, onEdit, onResolve
-   * Processing: Initialize ReportCard with report data and callback functions
+   * Processing: Initialise ReportCard with report data and callback functions
    * Output: ReportCard instance
    */
   ReportCard({

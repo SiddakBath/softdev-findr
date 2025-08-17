@@ -44,7 +44,7 @@ class ConfirmationDialog extends StatelessWidget {
    * Constructor for ConfirmationDialog widget
    * 
    * Input: Key? key, String title, message, confirmText, cancelText, VoidCallback? onConfirm, onCancel
-   * Processing: Initialize ConfirmationDialog with dialog content and callback functions
+   * Processing: Initialise ConfirmationDialog with dialog content and callback functions
    * Output: ConfirmationDialog instance
    */
   const ConfirmationDialog({

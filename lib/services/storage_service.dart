@@ -92,7 +92,7 @@ class StorageService {
           'Permission denied. Please check your authentication status.',
         );
       } else if (e.toString().contains('storage/unauthorized')) {
-        throw Exception('Unauthorized access to storage. Please log in again.');
+        throw Exception('Unauthorised access to storage. Please log in again.');
       } else {
         throw Exception('Failed to upload image: $e');
       }

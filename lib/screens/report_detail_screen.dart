@@ -3,7 +3,7 @@
  * 
  * Detailed view screen for lost and found reports
  * 
- * Displays complete report information in organized sections.
+ * Displays complete report information in organised sections.
  * Provides owner-specific actions for editing and deleting reports.
  * 
  * Author: Siddak Bath
@@ -25,13 +25,13 @@ import 'report_form_screen.dart';
 /**
  * Report detail screen for viewing complete report information
  * 
- * Displays all information about a lost or found item in an organized,
+ * Displays all information about a lost or found item in an organised,
  * visually appealing format. Provides owner-specific actions for
  * report management and contact options for resolution.
  * 
  * Screen Layout:
  * - App bar with title and owner actions
- * - Scrollable content with organized sections
+ * - Scrollable content with organised sections
  * - Image section with color-coded background
  * - Action button for contact/resolution
  * - Information sections for all report data
@@ -66,7 +66,7 @@ class ReportDetailScreen extends StatelessWidget {
    * Input: BuildContext context
    * Processing: 
    * - Create scaffold with app bar and owner actions
-   * - Build scrollable content with organized sections
+   * - Build scrollable content with organised sections
    * - Display report information in structured layout
    * - Handle user interactions and navigation
    * Output: Widget - Complete report detail screen interface

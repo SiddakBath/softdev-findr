@@ -25,16 +25,16 @@ import 'screens/home_screen.dart';
  * 
  * Input: None
  * Processing: 
- * - Initialize Flutter bindings
- * - Initialize Firebase with platform-specific options
+ * - Initialise Flutter bindings
+ * - Initialise Firebase with platform-specific options
  * - Start the Flutter application
  * Output: void (none)
  */
 void main() async {
-  // Ensure Flutter bindings are initialized before Firebase
+  // Ensure Flutter bindings are initialised before Firebase
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase with platform-specific options
+  // Initialise Firebase with platform-specific options
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Start the application

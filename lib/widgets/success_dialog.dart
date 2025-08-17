@@ -39,7 +39,7 @@ class SuccessDialog extends StatelessWidget {
    * Constructor for SuccessDialog widget
    * 
    * Input: Key? key, String title, message, VoidCallback? onDismiss
-   * Processing: Initialize SuccessDialog with dialog content and dismiss callback
+   * Processing: Initialise SuccessDialog with dialog content and dismiss callback
    * Output: SuccessDialog instance
    */
   const SuccessDialog({
