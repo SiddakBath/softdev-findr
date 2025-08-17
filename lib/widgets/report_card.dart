@@ -10,6 +10,7 @@
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
  * Version: v1.7
+ * Recent Maintenance: Added an owner-specific action menu with edit, delete, and resolve options, along with improved visual feedback and colour-coded status indicators for better user experience.
  */
 
 import 'package:flutter/material.dart';
@@ -269,20 +270,23 @@ class ReportCard extends StatelessWidget {
 
                     const SizedBox(height: 6),
 
-                    // Report description
-                    Text(
-                      report.description,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                        height: 1.3, // Line height for better readability
+                    // Report description - Flexible to prevent overflow
+                    Expanded(
+                      child: Text(
+                        report.description,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                          height: 1.3, // Line height for better readability
+                        ),
+                        maxLines: 2, // Limit to two lines
+                        overflow:
+                            TextOverflow.ellipsis, // Show ellipsis if truncated
                       ),
-                      maxLines: 2, // Limit to two lines
-                      overflow:
-                          TextOverflow.ellipsis, // Show ellipsis if truncated
                     ),
 
-                    const Spacer(), // Push tags to bottom
+                    const SizedBox(height: 6),
+
                     // Tags display (limited to first 3 tags)
                     Wrap(
                       spacing: 4,

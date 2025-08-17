@@ -10,6 +10,7 @@
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
  * Version: v1.7
+ * Recent Maintenance: Implemented image validation and file size checking to prevent oversized uploads, along with metadata tracking for better file management and debugging capabilities.
  */
 
 import 'dart:io';

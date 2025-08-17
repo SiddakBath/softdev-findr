@@ -10,6 +10,7 @@
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
  * Version: v1.7
+ * Recent Maintenance: Added password confirmation validation to ensure users enter matching passwords during registration, which prevents account creation with mismatched credentials.
  */
 
 import 'package:flutter/material.dart';

@@ -10,6 +10,7 @@
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
  * Version: v1.7
+ * Recent Maintenance: Added real-time streaming capabilities with type filtering to enable dynamic updates of report lists without manual refresh, which improves the user experience for collaborative lost and found operations.
  */
 
 import 'package:cloud_firestore/cloud_firestore.dart';

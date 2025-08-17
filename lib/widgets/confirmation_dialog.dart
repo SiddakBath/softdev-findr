@@ -10,6 +10,7 @@
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
  * Version: v1.7
+ * Recent Maintenance: Implemented a confirmation dialog component with dual-button layout and callback support to prevent accidental deletions and provide user control over destructive operations.
  */
 
 import 'package:flutter/material.dart';

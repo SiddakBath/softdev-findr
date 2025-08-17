@@ -10,6 +10,7 @@
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
  * Version: v1.7
+ * Recent Maintenance: Enhanced the owner-specific action menu with confirmation dialogs for destructive operations and improved visual feedback for user interactions to prevent accidental deletions.
  */
 
 import 'package:findr/models/report.dart';

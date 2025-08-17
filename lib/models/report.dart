@@ -10,6 +10,7 @@
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
  * Version: v1.7
+ * Recent Maintenance: Enhanced the data model with improved type safety for tags list conversion and added proper DateTime parsing with error handling to prevent crashes from malformed date data.
  */
 
 /**

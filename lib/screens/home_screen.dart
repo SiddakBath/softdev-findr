@@ -10,6 +10,7 @@
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
  * Version: v1.7
+ * Recent Maintenance: Implemented real-time search functionality with debounced text input and enhanced filtering options to improve the user experience when browsing through large numbers of reports.
  */
 
 import 'package:flutter/material.dart';
@@ -244,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisCount: 2, // 2 columns for responsive layout
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
-                    childAspectRatio: 0.8, // Card aspect ratio
+                    childAspectRatio: 0.7, // Card aspect ratio - made taller
                   ),
                   itemCount: sortedReports.length,
                   itemBuilder: (context, index) {

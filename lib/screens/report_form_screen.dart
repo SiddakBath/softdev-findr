@@ -10,6 +10,7 @@
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
  * Version: v1.7
+ * Recent Maintenance: Added image compression and validation features to prevent oversized uploads and improve storage efficiency, along with enhanced colour picker integration for better item identification.
  */
 
 import 'package:flutter/material.dart';

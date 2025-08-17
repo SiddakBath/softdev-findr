@@ -10,6 +10,7 @@
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
  * Version: v1.7
+ * Recent Maintenance: Enhanced form validation with improved error handling and added input sanitisation by trimming whitespace from email and password fields to prevent authentication failures.
  */
 
 import 'package:flutter/material.dart';

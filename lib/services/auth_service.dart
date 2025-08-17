@@ -10,6 +10,7 @@
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
  * Version: v1.7
+ * Recent Maintenance: Improved error handling with comprehensive Firebase Auth exception mapping to provide more user-friendly error messages for common authentication failures such as weak passwords and invalid emails.
  */
 
 import 'package:firebase_auth/firebase_auth.dart';

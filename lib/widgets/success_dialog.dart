@@ -10,6 +10,7 @@
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
  * Version: v1.7
+ * Recent Maintenance: Created a reusable success dialog component with consistent purple theme styling and customizable content to provide uniform user feedback across all report operations.
  */
 
 import 'package:flutter/material.dart';

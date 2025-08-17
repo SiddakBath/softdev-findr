@@ -10,6 +10,7 @@
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
  * Version: v1.7
+ * Recent Maintenance: Resolved authentication state management issues by implementing AuthWrapper, which now properly handles user session persistence and automatically navigates between authenticated and unauthenticated states.
  */
 
 import 'package:flutter/material.dart';
