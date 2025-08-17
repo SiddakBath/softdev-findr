@@ -9,7 +9,7 @@
  * Author: Siddak Bath
  * Created: [17/07/2025]
  * Last Modified: [05/08/2025]
- * Version: v1
+ * Version: v1.7
  */
 
 import 'package:findr/models/report.dart';
@@ -209,136 +209,141 @@ class ReportDetailScreen extends StatelessWidget {
           (context) => SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () async {
-                if (isOwner) {
-                  if (report.resolved) {
-                    // Report is already resolved - show info dialog
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text(
-                            'Report Status',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          content: const Text(
-                            'This report has already been marked as resolved.',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: Text(
-                                'OK',
-                                style: TextStyle(
-                                  color: Colors.green[600],
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  } else {
-                    // Resolve action for owner
-                    final shouldResolve = await showConfirmationDialog(
-                      context,
-                      title: 'Mark as Resolved',
-                      message:
-                          'Are you sure you want to mark this report as resolved?',
-                      confirmText: 'Resolve',
-                      cancelText: 'Cancel',
-                    );
+              onPressed:
+                  report.resolved
+                      ? null
+                      : () async {
+                        if (isOwner) {
+                          if (report.resolved) {
+                            // Report is already resolved - show info dialog
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                    'Report Status',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  content: const Text(
+                                    'This report has already been marked as resolved.',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed:
+                                          () => Navigator.of(context).pop(),
+                                      child: Text(
+                                        'OK',
+                                        style: TextStyle(
+                                          color: Colors.green[600],
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          } else {
+                            // Resolve action for owner
+                            final shouldResolve = await showConfirmationDialog(
+                              context,
+                              title: 'Mark as Resolved',
+                              message:
+                                  'Are you sure you want to mark this report as resolved?',
+                              confirmText: 'Resolve',
+                              cancelText: 'Cancel',
+                            );
 
-                    if (shouldResolve == true) {
-                      await _firestoreService.markResolved(report.id);
-                      showSuccessDialog(
-                        context,
-                        title: 'Success!',
-                        message: 'Report marked as resolved!',
-                      );
-                    }
-                  }
-                } else {
-                  // Show reporter's email for non-owner
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text(
-                          'Contact Information',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Reporter\'s Email:',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[50],
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.grey[200]!),
-                              ),
-                              child: Text(
-                                report.reporterEmail,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w500,
+                            if (shouldResolve == true) {
+                              await _firestoreService.markResolved(report.id);
+                              showSuccessDialog(
+                                context,
+                                title: 'Success!',
+                                message: 'Report marked as resolved!',
+                              );
+                            }
+                          }
+                        } else {
+                          // Show reporter's email for non-owner
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text(
+                                  'Contact Information',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'You can contact the reporter directly using this email address.',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: Text(
-                              'Close',
-                              style: TextStyle(
-                                color: Colors.purple[600],
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }
-              },
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Reporter\'s Email:',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[50],
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: Colors.grey[200]!,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        report.reporterEmail,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black87,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    const Text(
+                                      'You can contact the reporter directly using this email address.',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.of(context).pop(),
+                                    child: Text(
+                                      'Close',
+                                      style: TextStyle(
+                                        color: Colors.purple[600],
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      },
               style: ElevatedButton.styleFrom(
                 backgroundColor:
-                    isOwner && report.resolved
-                        ? Colors.green
-                        : Colors.purple[600],
+                    report.resolved ? Colors.green : Colors.purple[600],
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -348,7 +353,7 @@ class ReportDetailScreen extends StatelessWidget {
               child: Text(
                 isOwner
                     ? (report.resolved ? 'Resolved' : 'Resolve')
-                    : 'Show Contact',
+                    : (report.resolved ? 'Resolved' : 'Show Contact'),
                 style: const TextStyle(
                   fontSize: 16,
                   color: Colors.white,
